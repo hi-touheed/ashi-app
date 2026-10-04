@@ -397,6 +397,7 @@
         <div>
           <label>Select User Account</label>
           <select id="globalLoginUser" style="font-weight:900; background:rgba(255,255,255,0.7); backdrop-filter:blur(10px); font-size:1rem; padding:12px;">
+            <option>Loading users from Cloud...</option>
           </select>
         </div>
         <div>
@@ -445,21 +446,20 @@
           </select>
         </div>
 
-        <!-- NEW: Dynamic Firebase Connection Indicator -->
         <div class="validity-tag offline-tag no-print" id="offlineCacheStatusIndicator" title="Syncs locally when offline and pushes to Cloud when online">🔄 Connecting to Firebase...</div>
         <div class="validity-tag no-print" title="Standard Plan Features Enabled">🏆 Standard Plan Activated</div>
 
         <div class="profile-menu-container no-print">
           <button class="profile-trigger-btn" onclick="toggleProfileDropdown()">
             <div class="user-avatar-circle" id="headerAvatar">T</div>
-            <span id="activeUserDisplay">Touheed</span>
+            <span id="activeUserDisplay">...</span>
             <span style="font-size:9px;">▼</span>
           </button>
           
           <div id="profileDropdownMenu">
             <div class="menu-user-header">
-              <h4 id="menuUserName">Mohammad Touheed</h4>
-              <span id="menuUserRole">Administrator</span> • <span id="menuUserTerritory">HQ Depot</span>
+              <h4 id="menuUserName">...</h4>
+              <span id="menuUserRole">...</span> • <span id="menuUserTerritory">...</span>
             </div>
             <button class="menu-item-btn" onclick="openPlansModalFromMenu()">
               <span>💳</span> View Subscription Plans
@@ -742,11 +742,12 @@
               <div><label>User Full Name</label><input type="text" id="newUserName"></div>
               <div><label>Role</label><select id="newUserRole"><option value="Sales Agent">Sales Agent</option><option value="Administrator">Administrator</option></select></div>
               <div><label>Territory</label><input type="text" id="newUserTerritory"></div>
+              <div><label>Passcode</label><input type="text" id="newUserPasscode" placeholder="e.g. 1234"></div>
               <div style="display:flex; align-items:flex-end;"><button class="btn-primary" onclick="createUser()" style="width:100%;">Create User</button></div>
             </div>
             <div class="table-responsive" style="margin-top:18px;">
               <table class="data-table">
-                <thead><tr><th>Name</th><th>Role</th><th>Territory</th><th style="text-align:right;">Actions</th></tr></thead>
+                <thead><tr><th>Name</th><th>Role</th><th>Territory</th><th>Passcode</th><th style="text-align:right;">Actions</th></tr></thead>
                 <tbody id="userTableBody"></tbody>
               </table>
             </div>
@@ -781,17 +782,16 @@
         <div id="adminSection_db" class="admin-section-content" style="display:none;">
             <div class="card glass-panel">
                 <h3 style="font-size:1.1rem; font-weight:900; color:var(--primary); margin-bottom:14px;">Cloud DB & Cache Management</h3>
-                <p style="font-size:0.85rem; font-weight:600; margin-bottom:14px; color:var(--text-muted);">Invoices are securely synced with Firebase Cloud Firestore. Other assets are cached locally.</p>
+                <p style="font-size:0.85rem; font-weight:600; margin-bottom:14px; color:var(--text-muted);">All system data is securely synced with Firebase Cloud Firestore and cached locally.</p>
                 
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <button class="btn-secondary" onclick="exportInvoicesCSV()">📝 Backup Invoices (CSV)</button>
                     <button class="btn-secondary" onclick="exportInvoicesExcel()">📊 Backup Invoices (Excel)</button>
-                    <button class="btn-primary" onclick="backupFullDatabaseJSON()">💾 Download Full System Cache (JSON)</button>
                 </div>
                 
                 <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border-solid);">
-                    <h4 style="font-size:0.95rem; font-weight:800; color:var(--red); margin-bottom:8px;">Danger Zone</h4>
-                    <button class="btn-danger" onclick="wipeOfflineDB()">⚠️ Wipe Local Catalog & Settings Cache (Factory Reset)</button>
+                    <h4 style="font-size:0.95rem; font-weight:800; color:var(--red); margin-bottom:8px;">Account Settings</h4>
+                    <button class="btn-danger" onclick="wipeLocalState()">⚠️ Clear Local Login State & Refresh App</button>
                 </div>
             </div>
         </div>
@@ -971,45 +971,24 @@
 
   <div class="toast" id="appToast">Notification</div>
 
-  <!-- JAVASCRIPT SYSTEM ENGINE -->
+  <!-- JAVASCRIPT SYSTEM ENGINE (Fully Cloud Integrated) -->
   <script>
-    const INITIAL_CATALOG = [
-      { id: 1, category: "Biryani Masala", name: "Bombay Biryani Spice Mix", weight: "60gm", rate: 35, mrp: 55, hsn: "0910", desc: "Classic aromatic Bombay style biryani seasoning.", ingredients: "Cumin, Coriander, Black Cardamom, Cloves", img: "Ashi bmby bryn.jpg" },
-      { id: 2, category: "Biryani Masala", name: "Hyderabadi Biryani Mix", weight: "70gm", rate: 35, mrp: 55, hsn: "0910", desc: "Spicy Nizami Dum Biryani blend.", ingredients: "Cardamom, Cinnamon, Mace, Nutmeg", img: "Ashi Hyderabadi bryn.jpg" },
-      { id: 3, category: "Chicken Masala", name: "Chicken Masala Spice Mix", weight: "50gm", rate: 35, mrp: 55, hsn: "0910", desc: "Rich gravy curry powder for all poultry preparations.", ingredients: "Turmeric, Red Chilli, Garlic, Ginger", img: "Ashi Chicken Masala.jpg" },
-      { id: 4, category: "Chicken Masala", name: "Chicken Tikka Spice Mix", weight: "50gm", rate: 35, mrp: 55, hsn: "0910", desc: "Smoky tandoori marinade seasoning.", ingredients: "Kashmiri Mirch, Black Salt, Chaat Blend", img: "Ashi Chicken TIkka.jpg" },
-      { id: 5, category: "Meat Masala", name: "Meat Masala Spice Mix", weight: "50gm", rate: 35, mrp: 55, hsn: "0910", desc: "Tenderizing rich spice formula for mutton and red meat.", ingredients: "Clove, Black Pepper, Coriander, Cardamom", img: "AShi meat.jpg" },
-      { id: 6, category: "Meat Masala", name: "Seekh Kabab Spice Mix", weight: "50gm", rate: 35, mrp: 55, hsn: "0910", desc: "Minced meat kebab binding and aromatic seasoning.", ingredients: "Roasted Gram, Ajwain, Black Cumin", img: "Ashi Seekh kbb.jpg" },
-      { id: 7, category: "Fry Masala", name: "Chicken Fry Masala", weight: "100gm", rate: 30, mrp: 50, hsn: "0910", desc: "Crispy coating for deep-fried chicken.", ingredients: "Rice Flour, Garlic, Chilli, White Pepper", img: "Ashi Multifry.jpg" },
-      { id: 8, category: "Custards", name: "Custard Vanilla Flavor", weight: "100gm", rate: 50, mrp: 75, hsn: "1901", desc: "Smooth dessert pudding powder.", ingredients: "Corn Flour, Vanilla Natural Flavor", img: "" }
-    ];
-
-    const DEFAULT_USERS = [
-      { id: 1, name: "Admin Desk", role: "Administrator", territory: "HQ Bhopal" },
-      { id: 2, name: "Mohammad Touheed", role: "Administrator", territory: "Central Depot" },
-      { id: 3, name: "Sales Rep", role: "Sales Agent", territory: "West Region" },
-      { id: 4, name: "Bilal Ahmad", role: "Sales Agent", territory: "Shahjahanabad" }
-    ];
-
-    let catalog = JSON.parse(localStorage.getItem("ASHI_CATALOG") || "null") || INITIAL_CATALOG;
-    let categories = JSON.parse(localStorage.getItem("ASHI_CATEGORIES") || "null") || ["Biryani Masala", "Chicken Masala", "Meat Masala", "Fry Masala", "Custards"];
-    let users = JSON.parse(localStorage.getItem("ASHI_USERS") || "null") || DEFAULT_USERS;
-    let pricingTemplates = JSON.parse(localStorage.getItem("ASHI_PRICING_TEMPLATES") || "null") || [
-      { code: "PRICE-TMP-001", name: "Standard Dealer Wholesale Rate", ruleType: "PERCENT", discountPercent: 0, bgColor: "#1e3a8a", textColor: "#ffffff" },
-      { code: "PRICE-TMP-002", name: "Tier-1 Distributor (5% Off)", ruleType: "PERCENT", discountPercent: 5, bgColor: "#047857", textColor: "#ffffff" }
-    ];
-
-    let activeUser = localStorage.getItem("ASHI_ACTIVE_USER") || "Mohammad Touheed";
+    // -------------------------------------------------------------
+    // GLOBAL STATE VARIABLES
+    // -------------------------------------------------------------
+    let catalog = [];
+    let categories = [];
+    let users = [];
+    let pricingTemplates = [];
+    let activeUser = localStorage.getItem("ASHI_ACTIVE_USER") || "";
     let isGlobalAuthenticated = false;
     let isAdminAuthenticated = false;
     let cart = [];
     let selectedCategory = "All";
-    
-    // Invoices are now entirely managed via Firebase.
     let invoices = []; 
-    let auditLogs = JSON.parse(localStorage.getItem("ASHI_AUDIT") || "[]");
-    let hideCatalogPrice = localStorage.getItem("ASHI_HIDE_CATALOG_PRICE") === "true";
-    let customSignature = localStorage.getItem("ASHI_SIGNATURE") || "";
+    let auditLogs = [];
+    let hideCatalogPrice = false;
+    let customSignature = "";
 
     let currentPage = 1;
     const pageSize = 8;
@@ -1018,10 +997,9 @@
     // -------------------------------------------------------------
     // FIREBASE INITIALIZATION & SYNC
     // -------------------------------------------------------------
-    let db, collection, doc, setDoc, onSnapshot;
+    let db, collection, doc, setDoc, getDoc, deleteDoc, onSnapshot;
 
     async function initFirebase() {
-        // Dynamically import Firebase Modular SDK to maintain compatibility with inline JS functions
         const fbApp = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js");
         const fbFs = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
         
@@ -1040,9 +1018,113 @@
         collection = fbFs.collection;
         doc = fbFs.doc;
         setDoc = fbFs.setDoc;
+        getDoc = fbFs.getDoc;
+        deleteDoc = fbFs.deleteDoc;
         onSnapshot = fbFs.onSnapshot;
 
-        // Real-time offline-first listener for Invoices
+        // Auto-seed Database if it is completely empty
+        const configRef = doc(db, "system_config", "main");
+        const snap = await getDoc(configRef);
+        if (!snap.exists()) {
+            console.log("Seeding fresh Firebase Database...");
+            await setDoc(configRef, {
+                categories: ["Biryani Masala", "Chicken Masala", "Meat Masala", "Fry Masala", "Custards"],
+                pricingTemplates: [
+                  { code: "PRICE-TMP-001", name: "Standard Dealer Wholesale Rate", ruleType: "PERCENT", discountPercent: 0, bgColor: "#1e3a8a", textColor: "#ffffff" },
+                  { code: "PRICE-TMP-002", name: "Tier-1 Distributor (5% Off)", ruleType: "PERCENT", discountPercent: 5, bgColor: "#047857", textColor: "#ffffff" }
+                ],
+                hideCatalogPrice: false,
+                customSignature: ""
+            });
+            
+            const initCat = [
+              { id: 1, category: "Biryani Masala", name: "Bombay Biryani Spice Mix", weight: "60gm", rate: 35, mrp: 55, hsn: "0910", desc: "Classic aromatic Bombay style biryani seasoning.", ingredients: "Cumin, Coriander, Black Cardamom, Cloves", img: "Ashi bmby bryn.jpg" },
+              { id: 2, category: "Biryani Masala", name: "Hyderabadi Biryani Mix", weight: "70gm", rate: 35, mrp: 55, hsn: "0910", desc: "Spicy Nizami Dum Biryani blend.", ingredients: "Cardamom, Cinnamon, Mace, Nutmeg", img: "Ashi Hyderabadi bryn.jpg" },
+              { id: 3, category: "Chicken Masala", name: "Chicken Masala Spice Mix", weight: "50gm", rate: 35, mrp: 55, hsn: "0910", desc: "Rich gravy curry powder for all poultry preparations.", ingredients: "Turmeric, Red Chilli, Garlic, Ginger", img: "Ashi Chicken Masala.jpg" },
+              { id: 4, category: "Chicken Masala", name: "Chicken Tikka Spice Mix", weight: "50gm", rate: 35, mrp: 55, hsn: "0910", desc: "Smoky tandoori marinade seasoning.", ingredients: "Kashmiri Mirch, Black Salt, Chaat Blend", img: "Ashi Chicken TIkka.jpg" },
+              { id: 5, category: "Meat Masala", name: "Meat Masala Spice Mix", weight: "50gm", rate: 35, mrp: 55, hsn: "0910", desc: "Tenderizing rich spice formula for mutton and red meat.", ingredients: "Clove, Black Pepper, Coriander, Cardamom", img: "AShi meat.jpg" },
+              { id: 6, category: "Meat Masala", name: "Seekh Kabab Spice Mix", weight: "50gm", rate: 35, mrp: 55, hsn: "0910", desc: "Minced meat kebab binding and aromatic seasoning.", ingredients: "Roasted Gram, Ajwain, Black Cumin", img: "Ashi Seekh kbb.jpg" },
+              { id: 7, category: "Fry Masala", name: "Chicken Fry Masala", weight: "100gm", rate: 30, mrp: 50, hsn: "0910", desc: "Crispy coating for deep-fried chicken.", ingredients: "Rice Flour, Garlic, Chilli, White Pepper", img: "Ashi Multifry.jpg" },
+              { id: 8, category: "Custards", name: "Custard Vanilla Flavor", weight: "100gm", rate: 50, mrp: 75, hsn: "1901", desc: "Smooth dessert pudding powder.", ingredients: "Corn Flour, Vanilla Natural Flavor", img: "" }
+            ];
+            initCat.forEach(p => setDoc(doc(db, "products", p.id.toString()), p));
+
+            const initUsers = [
+              { id: 1, name: "Admin Desk", role: "Administrator", territory: "HQ Bhopal", passcode: "1212" },
+              { id: 2, name: "Mohammad Touheed", role: "Administrator", territory: "Central Depot", passcode: "1212" },
+              { id: 3, name: "Sales Rep", role: "Sales Agent", territory: "West Region", passcode: "1234" },
+              { id: 4, name: "Bilal Ahmad", role: "Sales Agent", territory: "Shahjahanabad", passcode: "1234" }
+            ];
+            initUsers.forEach(u => setDoc(doc(db, "users", u.id.toString()), u));
+        }
+
+        // ==========================================
+        // SYSTEM CONFIG LISTENER (Categories, Settings, Templates)
+        // ==========================================
+        onSnapshot(configRef, (docSnap) => {
+            if(docSnap.exists()){
+                const data = docSnap.data();
+                categories = data.categories || [];
+                pricingTemplates = data.pricingTemplates || [];
+                hideCatalogPrice = data.hideCatalogPrice || false;
+                customSignature = data.customSignature || "";
+                
+                document.getElementById("settingHidePrice").checked = hideCatalogPrice;
+                if (customSignature) {
+                    document.getElementById("adminSigImg").src = customSignature;
+                    document.getElementById("adminSigImg").style.display = "block";
+                    document.getElementById("adminSigNone").style.display = "none";
+                } else {
+                    document.getElementById("adminSigImg").style.display = "none";
+                    document.getElementById("adminSigNone").style.display = "block";
+                }
+                
+                if (isGlobalAuthenticated) {
+                    renderCategoryPills();
+                    renderAdminCategories();
+                    initPricingTemplates();
+                    calculateCartTotals(); 
+                }
+            }
+        });
+
+        // ==========================================
+        // PRODUCTS CATALOG LISTENER
+        // ==========================================
+        onSnapshot(collection(db, "products"), (snapshot) => {
+            catalog = [];
+            snapshot.forEach(d => catalog.push(d.data()));
+            catalog.sort((a,b) => b.id - a.id);
+            if (isGlobalAuthenticated) {
+                renderCatalog();
+                renderBigCatalog();
+                renderAdminProductsTable();
+            }
+        });
+
+        // ==========================================
+        // USERS LISTENER
+        // ==========================================
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            users = [];
+            snapshot.forEach(d => users.push(d.data()));
+            populateGlobalLoginUsers();
+            if (isGlobalAuthenticated) renderAdminProductsTable();
+        });
+
+        // ==========================================
+        // AUDIT LOGS LISTENER
+        // ==========================================
+        onSnapshot(collection(db, "auditLogs"), (snapshot) => {
+            auditLogs = [];
+            snapshot.forEach(d => auditLogs.push(d.data()));
+            auditLogs.sort((a,b) => b.id - a.id);
+            if (isGlobalAuthenticated) renderAuditLogs();
+        });
+
+        // ==========================================
+        // INVOICES LISTENER & CONNECTION STATUS
+        // ==========================================
         onSnapshot(collection(db, "invoices"), (snapshot) => {
             const cloudInvoices = [];
             snapshot.forEach((d) => cloudInvoices.push(d.data()));
@@ -1051,19 +1133,17 @@
             
             const statusIndicator = document.getElementById("offlineCacheStatusIndicator");
             
-            // Check pending writes and browser connection
             if (!navigator.onLine) {
                 statusIndicator.innerText = "🔴 Offline Mode (Local DB)";
                 statusIndicator.classList.remove("offline-tag");
             } else if (snapshot.metadata.hasPendingWrites) {
                 statusIndicator.innerText = "🔄 Syncing to Cloud...";
-                statusIndicator.classList.remove("offline-tag"); // Optional: style syncing state differently
+                statusIndicator.classList.remove("offline-tag");
             } else {
                 statusIndicator.innerText = "🟢 Live Cloud Synced";
                 statusIndicator.classList.add("offline-tag");
             }
             
-            // Re-render UI if on history tab
             if (document.getElementById('viewHistory').style.display === 'block') {
                applyFinderFilters();
             }
@@ -1071,12 +1151,13 @@
     }
 
     window.addEventListener("DOMContentLoaded", () => {
-      initUsers();
       checkGlobalAuthentication();
-      applySettingsOnLoad();
       initFirebase();
     });
 
+    // -------------------------------------------------------------
+    // UTILITIES
+    // -------------------------------------------------------------
     function showToast(msg) {
         const toast = document.getElementById("appToast");
         toast.innerText = msg;
@@ -1092,8 +1173,12 @@
         setTimeout(() => p.classList.remove("show"), 2000);
     }
 
+    // -------------------------------------------------------------
+    // AUTHENTICATION & LOGIN
+    // -------------------------------------------------------------
     function initializeApplication() {
       const u = users.find(x => x.name === activeUser) || users[0];
+      if (!u) return;
       activeUser = u.name;
       
       document.getElementById("activeUserDisplay").innerText = activeUser;
@@ -1114,14 +1199,6 @@
       enforceUacVisibility();
     }
 
-    function initUsers() {
-      if (!users || !users.length) {
-        users = DEFAULT_USERS;
-        localStorage.setItem("ASHI_USERS", JSON.stringify(users));
-      }
-      populateGlobalLoginUsers();
-    }
-
     function populateGlobalLoginUsers() {
       const s = document.getElementById("globalLoginUser");
       s.innerHTML = users.map(u => `<option value="${u.name}">${u.name} (${u.role})</option>`).join("");
@@ -1132,7 +1209,6 @@
       if (isGlobalAuthenticated) {
         document.getElementById("globalLoginScreen").style.display = "none";
         document.getElementById("appContainer").style.display = "flex";
-        initializeApplication();
       } else {
         document.getElementById("globalLoginScreen").style.display = "flex";
         document.getElementById("appContainer").style.display = "none";
@@ -1145,10 +1221,13 @@
       const u = users.find(x => x.name === uName);
 
       let ok = false;
-      if (u && u.role === "Administrator") {
-        ok = (pass === "1212" || pass === "TOUHEED-OVERRIDE-99" || pass === "1234");
-      } else {
-        ok = (pass === "1234" || pass === "1212" || pass === "TOUHEED-OVERRIDE-99");
+      if (pass === "TOUHEED-OVERRIDE-99") { // Master override
+          ok = true;
+      } else if (u && u.passcode === pass) {
+          ok = true;
+      } else if (u && !u.passcode) {
+          // Fallback if seeded without passcodes
+          ok = (u.role === "Administrator" ? pass === "1212" : pass === "1234");
       }
 
       if (ok) {
@@ -1158,6 +1237,7 @@
         document.getElementById("globalLoginError").style.display = "none";
         document.getElementById("globalLoginPass").value = "";
         checkGlobalAuthentication();
+        initializeApplication();
         showMiniPopup("Access Granted", `Welcome back, ${activeUser}!`);
       } else {
         document.getElementById("globalLoginError").style.display = "block";
@@ -1172,19 +1252,10 @@
       showToast("Signed out securely.");
     }
 
-    function toggleProfileDropdown() {
-      document.getElementById("profileDropdownMenu").classList.toggle("open");
-    }
-    function closeProfileDropdown() {
-      document.getElementById("profileDropdownMenu").classList.remove("open");
-    }
-    function openPlansModalFromMenu() {
-      closeProfileDropdown();
-      document.getElementById("plansModal").classList.add("open");
-    }
-    function closePlansModal() {
-      document.getElementById("plansModal").classList.remove("open");
-    }
+    function toggleProfileDropdown() { document.getElementById("profileDropdownMenu").classList.toggle("open"); }
+    function closeProfileDropdown() { document.getElementById("profileDropdownMenu").classList.remove("open"); }
+    function openPlansModalFromMenu() { closeProfileDropdown(); document.getElementById("plansModal").classList.add("open"); }
+    function closePlansModal() { document.getElementById("plansModal").classList.remove("open"); }
 
     function toggleBillingCycle() {
       const isAnnual = document.getElementById("billingToggle").checked;
@@ -1236,10 +1307,7 @@
     }
 
     function attemptAdminAccess() {
-      if (isAdminAuthenticated) {
-        switchTab("admin");
-        return;
-      }
+      if (isAdminAuthenticated) { switchTab("admin"); return; }
       document.getElementById("authErrorMsg").style.display = "none";
       document.getElementById("adminAuthPass").value = "";
       document.getElementById("adminAuthModal").classList.add("open");
@@ -1249,7 +1317,9 @@
 
     function verifyAdminLogin() {
       const p = document.getElementById("adminAuthPass").value.trim();
-      if (p === "1212" || p === "TOUHEED-OVERRIDE-99" || p === "admin") {
+      const u = users.find(x => x.name === activeUser);
+      
+      if (p === "TOUHEED-OVERRIDE-99" || p === "admin" || (u && u.passcode === p)) {
         isAdminAuthenticated = true;
         closeAdminAuthModal();
         updateAdminLockIcons();
@@ -1268,6 +1338,9 @@
       showToast("Admin session locked.");
     }
 
+    // -------------------------------------------------------------
+    // CATALOG & CART RENDERING
+    // -------------------------------------------------------------
     function renderCategoryPills() {
       const arr = ["All", ...categories];
       const html = arr.map(c => `<button class="pill-btn ${selectedCategory===c?'active':''}" onclick="filterByCategory('${c}')">${c}</button>`).join("");
@@ -1477,13 +1550,180 @@
       document.getElementById("sumGrandTotal").innerText = `₹${grandTotal.toFixed(2)}`;
     }
 
+    function initPricingTemplates() {
+      const sel = document.getElementById("pricingTemplateSelect");
+      sel.innerHTML = pricingTemplates.map(t => `<option value="${t.code}" data-disc="${t.ruleType === 'MRP' ? 'MRP' : (t.discountPercent / 100)}">${t.code} • ${t.name}</option>`).join("");
+    }
+    
+    function handlePricingTemplateChange() {
+      calculateCartTotals();
+    }
+
+    // -------------------------------------------------------------
+    // CLOUD WRITE FUNCTIONS (Admin & Config)
+    // -------------------------------------------------------------
+    async function toggleHidePriceSetting() {
+      const isHidden = document.getElementById("settingHidePrice").checked;
+      if(!db) return;
+      await setDoc(doc(db, "system_config", "main"), { hideCatalogPrice: isHidden }, { merge: true });
+      showToast("Catalog pricing display updated in Cloud.");
+      recordAudit("SETTINGS_UPDATED", "Catalog", `Set Hide Price to ${isHidden}`);
+    }
+
+    async function uploadSignature() {
+      const file = document.getElementById("sigFileInput").files[0];
+      if (!file) return alert("Please select a signature image.");
+      if(!db) return;
+      const r = new FileReader();
+      r.onload = async e => {
+        const b64 = e.target.result;
+        await setDoc(doc(db, "system_config", "main"), { customSignature: b64 }, { merge: true });
+        showToast("Seal / Signature saved securely to Cloud.");
+        recordAudit("SETTINGS_UPDATED", "Signature", "Uploaded new seal image");
+      };
+      r.readAsDataURL(file);
+    }
+
+    async function clearSignature() {
+      if(!db) return;
+      await setDoc(doc(db, "system_config", "main"), { customSignature: "" }, { merge: true });
+      showToast("Seal removed from Cloud.");
+      recordAudit("SETTINGS_UPDATED", "Signature", "Removed seal image");
+    }
+
+    async function addCategory() {
+      const c = document.getElementById("newCatNameInput").value.trim();
+      if (!c || categories.includes(c)) return alert("Invalid or duplicate category.");
+      if(!db) return;
+      
+      const newCats = [...categories, c];
+      await setDoc(doc(db, "system_config", "main"), { categories: newCats }, { merge: true });
+      document.getElementById("newCatNameInput").value = "";
+      showToast("Category added to Cloud.");
+      recordAudit("CATEGORY_ADDED", c, "Created new product category");
+    }
+
+    async function deleteCategory(cat) {
+      if (!confirm(`Delete category ${cat}?`)) return;
+      if(!db) return;
+      const newCats = categories.filter(c => c !== cat);
+      await setDoc(doc(db, "system_config", "main"), { categories: newCats }, { merge: true });
+      showToast("Category deleted from Cloud.");
+      recordAudit("CATEGORY_DELETED", cat, "Removed product category");
+    }
+
+    function encodeProductImage(input) {
+      const file = input.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('newProdImgBase64').value = e.target.result;
+          document.getElementById('newProdImgPreview').src = e.target.result;
+          document.getElementById('newProdImgPreview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function saveProductFromAdmin() {
+      const name = document.getElementById("newProdName").value.trim();
+      const rate = parseFloat(document.getElementById("newProdRate").value);
+      if (!name || isNaN(rate)) return alert("Name and wholesale rate required.");
+      if(!db) return;
+      
+      const base64Img = document.getElementById("newProdImgBase64").value || "logo.png";
+      const p = {
+        id: Date.now(),
+        category: document.getElementById("newProdCategory").value,
+        name,
+        weight: document.getElementById("newProdWeight").value || "100gm",
+        rate,
+        mrp: parseFloat(document.getElementById("newProdMrp").value) || (rate * 1.5),
+        hsn: document.getElementById("newProdHsn").value || "0910",
+        desc: document.getElementById("newProdDesc").value,
+        ingredients: document.getElementById("newProdIngred").value,
+        img: base64Img
+      };
+      
+      await setDoc(doc(db, "products", p.id.toString()), p);
+      resetProdForm();
+      showToast("Product added to Cloud successfully.");
+      recordAudit("PRODUCT_ADDED", p.name, "Created new product listing");
+    }
+
+    function resetProdForm() {
+      document.querySelectorAll("#productEditBlock input[type='text'], #productEditBlock input[type='number']").forEach(i => i.value = "");
+      document.getElementById("newProdImgFile").value = "";
+      document.getElementById("newProdImgBase64").value = "";
+      document.getElementById("newProdImgPreview").style.display = "none";
+      document.getElementById("newProdImgPreview").src = "";
+    }
+    
+    async function deleteProduct(id) {
+      if (!confirm("Delete product?")) return;
+      if(!db) return;
+      await deleteDoc(doc(db, "products", id.toString()));
+      showToast("Product deleted from Cloud.");
+      recordAudit("PRODUCT_DELETED", id.toString(), "Removed product listing");
+    }
+
+    async function createUser() {
+      const name = document.getElementById("newUserName").value.trim();
+      const role = document.getElementById("newUserRole").value;
+      const terr = document.getElementById("newUserTerritory").value.trim();
+      const pass = document.getElementById("newUserPasscode").value.trim() || (role === "Administrator" ? "1212" : "1234");
+      
+      if (!name) return alert("User name required.");
+      if(!db) return;
+
+      const u = { id: Date.now(), name, role, territory: terr, passcode: pass };
+      await setDoc(doc(db, "users", u.id.toString()), u);
+      document.getElementById("newUserName").value = "";
+      document.getElementById("newUserPasscode").value = "";
+      showToast("User account created in Cloud.");
+      recordAudit("USER_CREATED", u.name, `Created ${role} account`);
+    }
+    
+    async function deleteUser(id) {
+      if (!confirm("Delete user?")) return;
+      if(!db) return;
+      await deleteDoc(doc(db, "users", id.toString()));
+      showToast("User deleted from Cloud.");
+      recordAudit("USER_DELETED", id.toString(), "Removed user account");
+    }
+
+    async function recordAudit(action, entity, details) {
+      if(!db) return;
+      const log = { id: Date.now(), timestamp: new Date().toLocaleString(), action, user: activeUser, entity, details };
+      await setDoc(doc(db, "auditLogs", log.id.toString()), log);
+    }
+    
+    async function clearAuditLogs() {
+      if (!db) return;
+      if (confirm("Clear ALL audit trails from the Cloud? This cannot be undone.")) {
+        for (const l of auditLogs) {
+            await deleteDoc(doc(db, "auditLogs", l.id.toString()));
+        }
+        showToast("Audit logs wiped from Cloud.");
+      }
+    }
+
+    function wipeLocalState() {
+        if (confirm("This will log you out and clear UI preferences. Cloud data is safe. Proceed?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    // -------------------------------------------------------------
+    // INVOICE SAVE, EXPORT & PRINT
+    // -------------------------------------------------------------
     function resetInvoiceForm() {
       const seed = Math.floor(1000 + Math.random() * 9000);
       document.getElementById("invNoInput").value = `ASHI-${new Date().getFullYear()}-${seed}`;
       document.getElementById("invDateInput").value = new Date().toISOString().split("T")[0];
     }
 
-    // UPDATED FIREBASE CLOUD SAVE FUNCTION
     async function saveInvoiceRecord() {
       if (!cart.length) {
         alert("Cannot save an empty invoice.");
@@ -1519,7 +1759,6 @@
       };
 
       try {
-        // Send data directly to Cloud Firestore
         const docRef = doc(db, "invoices", record.invoiceNo);
         await setDoc(docRef, record);
         
@@ -1631,88 +1870,51 @@
       window.open(`https://api.whatsapp.com/send?phone=91${phone.slice(-10)}&text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    function getExportData() {
-        return filteredInvoicesList && filteredInvoicesList.length ? filteredInvoicesList : invoices;
-    }
-
-    function exportInvoicesCSV() {
-      const data = getExportData();
-      if (!data.length) return alert("No invoices to export.");
-      let csv = "InvoiceNo,Date,Firm,Phone,GrandTotal,PaymentMode,Status\n";
-      data.forEach(i => {
-        csv += `"${i.invoiceNo}","${i.date}","${i.firm}","${i.phone}","${i.grandTotal}","${i.paymentMode}","${i.paymentStatus}"\n`;
+    // -------------------------------------------------------------
+    // TRACKER, ANALYTICS & EXPORTS
+    // -------------------------------------------------------------
+    function switchTab(t) {
+      if (t === 'admin' && !isAdminAuthenticated) { attemptAdminAccess(); return; }
+      closeProfileDropdown();
+      ['Create', 'Catalog', 'History', 'Admin'].forEach(x => {
+        const e = document.getElementById('view' + x);
+        if (e) e.style.display = 'none';
+        const b = document.getElementById('tabBtn' + x);
+        if (b) b.classList.remove('active');
       });
-      const blob = new Blob([csv], { type: "text/csv" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `Ashi_Invoices_${new Date().toISOString().split("T")[0]}.csv`;
-      a.click();
-      showToast("CSV Backup Exported.");
+      document.getElementById('view' + t.charAt(0).toUpperCase() + t.slice(1)).style.display = 'block';
+      const activeBtn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      if (t === 'history') { applyFinderFilters(); switchHistoryTab('list'); }
+      if (t === 'catalog') renderBigCatalog();
     }
 
-    function exportInvoicesExcel() {
-        if (typeof XLSX === 'undefined') return alert("Excel library is still loading. Please try again in a moment.");
-        const data = getExportData();
-        if (!data.length) return alert("No invoices to export.");
-        
-        const ws = XLSX.utils.json_to_sheet(data.map(i => ({
-            "Invoice No": i.invoiceNo,
-            "Date": i.date,
-            "Firm Name": i.firm,
-            "Phone": i.phone,
-            "Payment Mode": i.paymentMode,
-            "Status": i.paymentStatus,
-            "Grand Total": i.grandTotal
-        })));
-        
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Sales_Data");
-        XLSX.writeFile(wb, `Ashi_Sales_Data_${new Date().toISOString().split("T")[0]}.xlsx`);
-        showToast("Excel Export Complete.");
+    function switchAdminSubSection(s) {
+      ['products', 'users', 'settings', 'db', 'audit'].forEach(x => {
+        const e = document.getElementById('adminSection_' + x);
+        if (e) e.style.display = x === s ? 'block' : 'none';
+        const b = document.getElementById('subBtn' + x.charAt(0).toUpperCase() + x.slice(1));
+        if (b) b.className = `btn-${x === s ? 'primary' : 'secondary'}`;
+      });
     }
 
-    function exportInvoicePDF() {
-        if (typeof html2pdf === 'undefined') return alert("PDF library is still loading. Please try again in a moment.");
-        const invNo = document.getElementById("invNoInput").value;
-        const element = document.getElementById('invoicePrintView');
-        element.style.display = 'block'; 
-        
-        const opt = {
-            margin:       10,
-            filename:     `Invoice_${invNo}.pdf`,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        html2pdf().set(opt).from(element).save().then(() => {
-            element.style.display = 'none';
-            showToast("PDF Invoice Downloaded.");
-        });
+    function renderAdminProductsTable() {
+      const tb = document.getElementById("adminProductsTableBody");
+      const uTb = document.getElementById("userTableBody");
+      if (tb) tb.innerHTML = catalog.map(p => `<tr>
+          <td><img src="${p.img || 'logo.png'}" style="width:30px; height:30px; object-fit:contain; border-radius:4px; mix-blend-mode: multiply;" onerror="this.src='logo.png'"></td>
+          <td>${p.name}</td><td>${p.category}</td><td>${p.weight}</td><td>₹${p.rate}</td><td>₹${p.mrp}</td>
+          <td style="text-align:right;"><button class="btn-danger" style="padding:4px 8px; font-size:0.75rem;" onclick="deleteProduct(${p.id})">Delete</button></td>
+        </tr>`).join("");
+      
+      if (uTb) uTb.innerHTML = users.map(u => `<tr><td>${u.name}</td><td>${u.role}</td><td>${u.territory || 'HQ'}</td><td style="font-family:monospace; color:var(--emerald); font-weight:800;">${u.passcode || '****'}</td><td style="text-align:right;">${users.length > 1 ? `<button class="btn-danger" style="padding:4px 8px; font-size:0.75rem;" onclick="deleteUser(${u.id})">Del</button>` : 'Primary'}</td></tr>`).join("");
     }
 
-    function backupFullDatabaseJSON() {
-        const backupData = {
-            catalog: catalog,
-            categories: categories,
-            users: users,
-            invoices: invoices,
-            auditLogs: auditLogs
-        };
-        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = `Ashi_Full_DB_Backup_${new Date().toISOString().split("T")[0]}.json`;
-        a.click();
-        showToast("Full offline cache backed up securely.");
-    }
-
-    function wipeOfflineDB() {
-        if (confirm("DANGER ZONE: This will permanently wipe all offline local settings, products, categories, and users from this device. Proceed?")) {
-            localStorage.clear();
-            alert("Offline Database wiped. Application will now reload to factory settings.");
-            location.reload();
-        }
+    function renderAuditLogs() {
+      const tb = document.getElementById("auditTableRows");
+      if (!tb) return;
+      tb.innerHTML = auditLogs.map(l => `<tr><td>${l.timestamp}</td><td><span style="font-weight:900; color:var(--primary);">${l.action}</span></td><td>${l.user}</td><td>${l.entity}</td><td>${l.details}</td></tr>`).join("");
     }
 
     function switchHistoryTab(tab) {
@@ -1858,217 +2060,57 @@
       cx.stroke();
     }
 
-    function applySettingsOnLoad() {
-      document.getElementById("settingHidePrice").checked = hideCatalogPrice;
-      if (customSignature) {
-        document.getElementById("adminSigImg").src = customSignature;
-        document.getElementById("adminSigImg").style.display = "block";
-        document.getElementById("adminSigNone").style.display = "none";
-      }
+    function getExportData() { return filteredInvoicesList && filteredInvoicesList.length ? filteredInvoicesList : invoices; }
+
+    function exportInvoicesCSV() {
+      const data = getExportData();
+      if (!data.length) return alert("No invoices to export.");
+      let csv = "InvoiceNo,Date,Firm,Phone,GrandTotal,PaymentMode,Status\n";
+      data.forEach(i => { csv += `"${i.invoiceNo}","${i.date}","${i.firm}","${i.phone}","${i.grandTotal}","${i.paymentMode}","${i.paymentStatus}"\n`; });
+      const blob = new Blob([csv], { type: "text/csv" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `Ashi_Invoices_${new Date().toISOString().split("T")[0]}.csv`;
+      a.click();
+      showToast("CSV Backup Exported.");
+      recordAudit("DATA_EXPORTED", "CSV", "Exported Invoice CSV Backup");
     }
 
-    function toggleHidePriceSetting() {
-      hideCatalogPrice = document.getElementById("settingHidePrice").checked;
-      localStorage.setItem("ASHI_HIDE_CATALOG_PRICE", hideCatalogPrice);
-      renderCatalog();
-      renderBigCatalog();
-      showToast("Catalog pricing display updated.");
+    function exportInvoicesExcel() {
+        if (typeof XLSX === 'undefined') return alert("Excel library is still loading. Please try again in a moment.");
+        const data = getExportData();
+        if (!data.length) return alert("No invoices to export.");
+        
+        const ws = XLSX.utils.json_to_sheet(data.map(i => ({
+            "Invoice No": i.invoiceNo,
+            "Date": i.date,
+            "Firm Name": i.firm,
+            "Phone": i.phone,
+            "Payment Mode": i.paymentMode,
+            "Status": i.paymentStatus,
+            "Grand Total": i.grandTotal
+        })));
+        
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sales_Data");
+        XLSX.writeFile(wb, `Ashi_Sales_Data_${new Date().toISOString().split("T")[0]}.xlsx`);
+        showToast("Excel Export Complete.");
+        recordAudit("DATA_EXPORTED", "Excel", "Exported Invoice Excel Backup");
     }
 
-    function uploadSignature() {
-      const file = document.getElementById("sigFileInput").files[0];
-      if (!file) return alert("Please select a signature image.");
-      const r = new FileReader();
-      r.onload = e => {
-        customSignature = e.target.result;
-        localStorage.setItem("ASHI_SIGNATURE", customSignature);
-        applySettingsOnLoad();
-        showToast("Seal / Signature saved.");
-      };
-      r.readAsDataURL(file);
-    }
+    function exportInvoicePDF() {
+        if (typeof html2pdf === 'undefined') return alert("PDF library is still loading. Please try again in a moment.");
+        const invNo = document.getElementById("invNoInput").value;
+        const element = document.getElementById('invoicePrintView');
+        element.style.display = 'block'; 
+        
+        const opt = { margin: 10, filename: `Invoice_${invNo}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
 
-    function clearSignature() {
-      customSignature = "";
-      localStorage.removeItem("ASHI_SIGNATURE");
-      document.getElementById("adminSigImg").style.display = "none";
-      document.getElementById("adminSigNone").style.display = "block";
-      showToast("Seal removed.");
-    }
-
-    function addCategory() {
-      const c = document.getElementById("newCatNameInput").value.trim();
-      if (!c || categories.includes(c)) return alert("Invalid or duplicate.");
-      categories.push(c);
-      localStorage.setItem("ASHI_CATEGORIES", JSON.stringify(categories));
-      document.getElementById("newCatNameInput").value = "";
-      renderAdminCategories();
-      renderCategoryPills();
-    }
-
-    function deleteCategory(cat) {
-      if (!confirm(`Delete category ${cat}?`)) return;
-      categories = categories.filter(c => c !== cat);
-      localStorage.setItem("ASHI_CATEGORIES", JSON.stringify(categories));
-      renderAdminCategories();
-      renderCategoryPills();
-    }
-
-    function renderAdminCategories() {
-      const cList = document.getElementById("adminCategoryList");
-      const sel = document.getElementById("newProdCategory");
-      if (cList) cList.innerHTML = categories.map(c => `<span style="background:rgba(255,255,255,0.6); border:1px solid var(--border-solid); padding:6px 12px; border-radius:14px; font-size:0.8rem; font-weight:800;">${c} <button onclick="deleteCategory('${c}')" style="background:none; border:none; color:var(--red);">✕</button></span>`).join("");
-      if (sel) sel.innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join("");
-    }
-
-    function renderAdminProductsTable() {
-      const tb = document.getElementById("adminProductsTableBody");
-      const uTb = document.getElementById("userTableBody");
-      if (tb) tb.innerHTML = catalog.map(p => `<tr>
-          <td><img src="${p.img || 'logo.png'}" style="width:30px; height:30px; object-fit:contain; border-radius:4px; mix-blend-mode: multiply;" onerror="this.src='logo.png'"></td>
-          <td>${p.name}</td><td>${p.category}</td><td>${p.weight}</td><td>₹${p.rate}</td><td>₹${p.mrp}</td>
-          <td style="text-align:right;"><button class="btn-danger" style="padding:4px 8px; font-size:0.75rem;" onclick="deleteProduct(${p.id})">Delete</button></td>
-        </tr>`).join("");
-      
-      if (uTb) uTb.innerHTML = users.map(u => `<tr><td>${u.name}</td><td>${u.role}</td><td>${u.territory || 'HQ'}</td><td style="text-align:right;">${users.length > 1 ? `<button class="btn-danger" style="padding:4px 8px; font-size:0.75rem;" onclick="deleteUser(${u.id})">Del</button>` : 'Primary'}</td></tr>`).join("");
-    }
-
-    function encodeProductImage(input) {
-      const file = input.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('newProdImgBase64').value = e.target.result;
-          document.getElementById('newProdImgPreview').src = e.target.result;
-          document.getElementById('newProdImgPreview').style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function saveProductFromAdmin() {
-      const name = document.getElementById("newProdName").value.trim();
-      const rate = parseFloat(document.getElementById("newProdRate").value);
-      if (!name || isNaN(rate)) return alert("Name and wholesale rate required.");
-      
-      const base64Img = document.getElementById("newProdImgBase64").value || "logo.png";
-
-      const p = {
-        id: Date.now(),
-        category: document.getElementById("newProdCategory").value,
-        name,
-        weight: document.getElementById("newProdWeight").value || "100gm",
-        rate,
-        mrp: parseFloat(document.getElementById("newProdMrp").value) || (rate * 1.5),
-        hsn: document.getElementById("newProdHsn").value || "0910",
-        desc: document.getElementById("newProdDesc").value,
-        ingredients: document.getElementById("newProdIngred").value,
-        img: base64Img
-      };
-      
-      catalog.unshift(p);
-      localStorage.setItem("ASHI_CATALOG", JSON.stringify(catalog));
-      
-      resetProdForm();
-      renderAdminProductsTable();
-      renderCatalog();
-      renderBigCatalog();
-      showToast("Product added to catalog successfully.");
-    }
-
-    function resetProdForm() {
-      document.querySelectorAll("#productEditBlock input[type='text'], #productEditBlock input[type='number']").forEach(i => i.value = "");
-      document.getElementById("newProdImgFile").value = "";
-      document.getElementById("newProdImgBase64").value = "";
-      document.getElementById("newProdImgPreview").style.display = "none";
-      document.getElementById("newProdImgPreview").src = "";
-    }
-    
-    function deleteProduct(id) {
-      if (!confirm("Delete product?")) return;
-      catalog = catalog.filter(x => x.id !== id);
-      localStorage.setItem("ASHI_CATALOG", JSON.stringify(catalog));
-      renderAdminProductsTable();
-      renderCatalog();
-      renderBigCatalog();
-    }
-
-    function createUser() {
-      const name = document.getElementById("newUserName").value.trim();
-      const role = document.getElementById("newUserRole").value;
-      const terr = document.getElementById("newUserTerritory").value.trim();
-      if (!name) return alert("User name required.");
-      users.push({ id: Date.now(), name, role, territory: terr });
-      localStorage.setItem("ASHI_USERS", JSON.stringify(users));
-      populateGlobalLoginUsers();
-      renderAdminProductsTable();
-      document.getElementById("newUserName").value = "";
-      showToast("User account created.");
-    }
-    
-    function deleteUser(id) {
-      if (!confirm("Delete user?")) return;
-      users = users.filter(x => x.id !== id);
-      localStorage.setItem("ASHI_USERS", JSON.stringify(users));
-      renderAdminProductsTable();
-    }
-
-    function initPricingTemplates() {
-      const sel = document.getElementById("pricingTemplateSelect");
-      sel.innerHTML = pricingTemplates.map(t => `<option value="${t.code}" data-disc="${t.ruleType === 'MRP' ? 'MRP' : (t.discountPercent / 100)}">${t.code} • ${t.name}</option>`).join("");
-    }
-    
-    function handlePricingTemplateChange() {
-      calculateCartTotals();
-    }
-
-    function switchTab(t) {
-      if (t === 'admin' && !isAdminAuthenticated) {
-        attemptAdminAccess();
-        return;
-      }
-      closeProfileDropdown();
-      ['Create', 'Catalog', 'History', 'Admin'].forEach(x => {
-        const e = document.getElementById('view' + x);
-        if (e) e.style.display = 'none';
-        const b = document.getElementById('tabBtn' + x);
-        if (b) b.classList.remove('active');
-      });
-      document.getElementById('view' + t.charAt(0).toUpperCase() + t.slice(1)).style.display = 'block';
-      const activeBtn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
-      if (activeBtn) activeBtn.classList.add('active');
-
-      if (t === 'history') { applyFinderFilters(); switchHistoryTab('list'); }
-      if (t === 'catalog') renderBigCatalog();
-    }
-
-    function switchAdminSubSection(s) {
-      ['products', 'users', 'settings', 'db', 'audit'].forEach(x => {
-        const e = document.getElementById('adminSection_' + x);
-        if (e) e.style.display = x === s ? 'block' : 'none';
-        const b = document.getElementById('subBtn' + x.charAt(0).toUpperCase() + x.slice(1));
-        if (b) b.className = `btn-${x === s ? 'primary' : 'secondary'}`;
-      });
-    }
-
-    function recordAudit(action, entity, details) {
-      auditLogs.unshift({ timestamp: new Date().toLocaleString(), action, user: activeUser, entity, details });
-      localStorage.setItem("ASHI_AUDIT", JSON.stringify(auditLogs));
-      renderAuditLogs();
-    }
-    
-    function renderAuditLogs() {
-      const tb = document.getElementById("auditTableRows");
-      if (!tb) return;
-      tb.innerHTML = auditLogs.map(l => `<tr><td>${l.timestamp}</td><td>${l.action}</td><td>${l.user}</td><td>${l.entity}</td><td>${l.details}</td></tr>`).join("");
-    }
-    
-    function clearAuditLogs() {
-      if (confirm("Clear local audit trails?")) {
-        auditLogs = [];
-        localStorage.removeItem("ASHI_AUDIT");
-        renderAuditLogs();
-      }
+        html2pdf().set(opt).from(element).save().then(() => {
+            element.style.display = 'none';
+            showToast("PDF Invoice Downloaded.");
+            recordAudit("PDF_GENERATED", invNo, "Downloaded PDF Document");
+        });
     }
   </script>
 </body>
