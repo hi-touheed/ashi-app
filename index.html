@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ASHI MASALE (Sales Portal) | by TA Soft</title>
+  <title>ASHI MASALE (Sales Portal) | by Flomation Ai</title>
   
   <!-- Modern Clean Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +14,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-  <!-- Google Translate Engine (Hidden natively, triggered via Custom UI) -->
+  <!-- Google Translate Engine -->
   <script type="text/javascript">
     function googleTranslateElementInit() {
       new google.translate.TranslateElement({
@@ -27,9 +27,7 @@
   <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
   <style>
-    /* =====================================================================
-       1. CORE SYSTEM & ENHANCED GLASSMORPHISM THEME
-       ===================================================================== */
+    /* 1. CORE SYSTEM & ENHANCED GLASSMORPHISM THEME */
     :root {
       --primary: #0f2756;
       --primary-hover: #1e3a8a;
@@ -53,7 +51,6 @@
       --shadow-md: 0 10px 25px -5px rgba(31, 38, 135, 0.1);
       --shadow-lg: 0 20px 40px -5px rgba(31, 38, 135, 0.15);
       
-      /* Enhanced Glassmorphism Variables */
       --glass-bg: rgba(255, 255, 255, 0.45);
       --glass-blur: blur(24px);
       --glass-border: 1px solid rgba(255, 255, 255, 0.65);
@@ -95,9 +92,6 @@
       box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.15);
     }
 
-    /* =====================================================================
-       2. LOGIN SCREEN
-       ===================================================================== */
     #globalLoginScreen { position: fixed; inset: 0; background: rgba(241, 245, 249, 0.5); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; z-index: 100000; }
     .login-box { 
       background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.8);
@@ -111,9 +105,6 @@
     .login-footer a { color: var(--primary); text-decoration: none; font-weight: 800; cursor: pointer; }
     .login-footer a:hover { text-decoration: underline; color: var(--border-focus); }
 
-    /* =====================================================================
-       3. PLANS MODAL (Monthly vs Annual Toggle)
-       ===================================================================== */
     .billing-toggle-container { display: flex; justify-content: center; align-items: center; gap: 14px; margin-bottom: 24px; font-weight: 800; color: var(--text-main); font-size: 1rem; }
     .switch { position: relative; display: inline-block; width: 54px; height: 28px; }
     .switch input { opacity: 0; width: 0; height: 0; }
@@ -132,9 +123,6 @@
     .plan-card ul li { margin-bottom: 10px; font-weight: 700; display: flex; align-items: flex-start; gap: 8px; }
     .plan-card ul li::before { content: "✓"; color: var(--emerald); font-weight: 900; }
 
-    /* =====================================================================
-       4. HEADER, SLIM GLASS RIBBON & PROFILE MENU
-       ===================================================================== */
     header { background: rgba(255, 255, 255, 0.4); backdrop-filter: var(--glass-blur); position: sticky; top: 0; z-index: 50; padding: 0.75rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: var(--glass-border); box-shadow: var(--shadow-sm); }
     .brand-section { display: flex; align-items: center; gap: 12px; cursor: pointer; }
     .brand-logo-img { height: 46px; width: auto; max-width: 140px; object-fit: contain; display: block; }
@@ -148,7 +136,7 @@
     .lang-pill-wrap { display: flex; align-items: center; background: rgba(255,255,255,0.4); border: var(--glass-border); padding: 4px 10px; border-radius: 9999px; }
     .lang-pill-wrap select { border: none; background: transparent; font-weight: 800; font-size: 0.78rem; color: var(--primary); cursor: pointer; outline: none; padding: 0; width: auto; }
 
-    .validity-tag { font-size: 0.78rem; font-weight: 900; padding: 5px 12px; border-radius: 9999px; display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.5); color: var(--primary); border: var(--glass-border); box-shadow: var(--shadow-sm); }
+    .validity-tag { font-size: 0.78rem; font-weight: 900; padding: 5px 12px; border-radius: 9999px; display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.5); color: var(--primary); border: var(--glass-border); box-shadow: var(--shadow-sm); transition: 0.3s ease; }
     .offline-tag { background: rgba(16, 185, 129, 0.2); color: #047857; border: 1px solid rgba(16, 185, 129, 0.4); }
 
     .profile-menu-container { position: relative; }
@@ -183,9 +171,6 @@
     .ticker-move { display: inline-block; animation: ticker 28s linear infinite; }
     @keyframes ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
 
-    /* ------------------------------------------------------------------
-       5. MAIN CONTAINER, CATALOG & CART
-       ------------------------------------------------------------------ */
     main { max-width: 1520px; width: 100%; margin: 0 auto; padding: 1.4rem; flex: 1; display: flex; flex-direction: column; }
     .card { border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.4rem; }
     
@@ -194,7 +179,6 @@
 
     label { display: block; font-size: 0.75rem; font-weight: 900; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.4px; }
     
-    /* Enhanced Glass Inputs */
     input, select, textarea { 
       width: 100%; padding: 10px 14px; 
       border: 1px solid var(--border-solid); 
@@ -216,7 +200,6 @@
 
     .row-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
 
-    /* Buttons */
     .btn-primary { background: var(--primary); color: #ffffff; border: none; padding: 10px 18px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 900; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; cursor: pointer; box-shadow: 0 4px 15px rgba(15, 39, 86, 0.3); }
     .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(15, 39, 86, 0.4); }
     .btn-secondary { background: rgba(255,255,255,0.6); color: var(--text-main); border: var(--glass-border); padding: 10px 18px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 900; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; cursor: pointer; box-shadow: var(--shadow-sm); backdrop-filter: blur(8px); }
@@ -225,7 +208,6 @@
     .btn-success { background: var(--emerald-subtle); color: #047857; border: 1px solid #a7f3d0; padding: 6px 12px; border-radius: var(--radius-sm); font-size: 0.78rem; font-weight: 800; cursor: pointer; }
     .btn-whatsapp { background: #25D366; color: #ffffff; border: none; padding: 10px 18px; border-radius: var(--radius-sm); font-size: 0.88rem; font-weight: 900; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); }
 
-    /* Catalog Cards */
     .catalog-top-bar { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; align-items: center; justify-content: space-between; }
     .filter-wrapper { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
     .pill-btn { padding: 8px 16px; border-radius: 9999px; font-size: 0.8rem; font-weight: 800; border: var(--glass-border); background: rgba(255,255,255,0.4); color: var(--text-main); white-space: nowrap; transition: 0.2s; cursor: pointer; box-shadow: var(--shadow-sm); }
@@ -250,14 +232,12 @@
     .add-btn { flex: 1; background: var(--primary-subtle); border: 1px solid rgba(37, 99, 235, 0.3); padding: 8px; border-radius: var(--radius-sm); font-size: 0.8rem; font-weight: 900; color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; transition: 0.2s; backdrop-filter: blur(4px); }
     .add-btn:hover { background: var(--primary); color: #ffffff; }
 
-    /* Full Catalog Page Grid */
     .big-catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
     .big-prod-card { background: rgba(255,255,255,0.5); backdrop-filter: blur(16px); border: var(--glass-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; transition: 0.3s; }
     .big-prod-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); background: rgba(255,255,255,0.7); }
     .big-prod-img { width: 100%; aspect-ratio: 1/1; object-fit: contain; background: rgba(255,255,255,0.6); border-bottom: var(--glass-border); padding: 12px; mix-blend-mode: multiply; }
     .big-prod-body { padding: 1.4rem; display: flex; flex-direction: column; flex: 1; }
 
-    /* Cart Box */
     .cart-box { position: sticky; top: 85px; background: rgba(255,255,255,0.55); backdrop-filter: blur(24px); border: var(--glass-border); border-radius: var(--radius-lg); padding: 1.4rem; box-shadow: var(--shadow-md); }
     .cart-items-scroll { max-height: 280px; overflow-y: auto; margin: 12px 0; border-top: var(--glass-border); border-bottom: var(--glass-border); padding: 8px 0; }
     .cart-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed rgba(255,255,255,0.5); }
@@ -273,11 +253,9 @@
     .summary-line { display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
     .summary-line.total { border-top: 2px solid rgba(255,255,255,0.8); padding-top: 10px; font-size: 1.2rem; font-weight: 900; color: var(--primary); margin-top: 4px; }
 
-    /* Floating Cart Button & Drawer */
     #floatingCartBtn { position: fixed; bottom: 24px; right: 24px; width: 62px; height: 62px; background: var(--primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-lg); z-index: 99; border: 2px solid rgba(255,255,255,0.4); }
     #floatingCartCount { position: absolute; top: -3px; right: -3px; background: var(--red); color: #fff; font-size: 0.75rem; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; }
 
-    /* Tables & Modals */
     .table-responsive { width: 100%; overflow-x: auto; border-radius: var(--radius-md); border: var(--glass-border); background: rgba(255,255,255,0.4); backdrop-filter: blur(12px); box-shadow: var(--shadow-sm); }
     table.data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; min-width: 800px; }
     table.data-table th { background: rgba(255,255,255,0.5); padding: 12px 14px; font-weight: 900; color: var(--text-main); border-bottom: 1px solid rgba(255,255,255,0.8); }
@@ -293,9 +271,6 @@
     .mini-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border: 2px solid var(--emerald); border-radius: var(--radius-lg); padding: 2.5rem; box-shadow: 0 30px 60px rgba(0,0,0,0.2); text-align: center; z-index: 110000; opacity: 0; pointer-events: none; transition: 0.3s; }
     .mini-popup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
 
-    /* =====================================================================
-       6. ISOLATED A4 PRINT VIEW (Unaffected by Glassmorphism)
-       ===================================================================== */
     #invoicePrintView { display: none; background: #ffffff; color: #000000; width: 100%; max-width: 780px; margin: 0 auto; padding: 36px; border: 1px solid #cbd5e1; border-radius: var(--radius-sm); position: relative; overflow: hidden; }
     .invoice-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 6.5rem; font-weight: 900; color: rgba(15, 39, 86, 0.04); white-space: nowrap; pointer-events: none; user-select: none; z-index: 0; letter-spacing: 5px; }
     .inv-header { display: flex; justify-content: space-between; border-bottom: 2px solid #0f2756; padding-bottom: 16px; margin-bottom: 16px; position: relative; z-index: 1; }
@@ -331,7 +306,6 @@
     .toast { position: fixed; bottom: 24px; right: 24px; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); color: #ffffff; padding: 12px 20px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 800; opacity: 0; transform: translateY(20px); transition: 0.3s; z-index: 100000; box-shadow: var(--shadow-md); border: 1px solid rgba(255,255,255,0.2); }
     .toast.show { opacity: 1; transform: translateY(0); }
     
-    /* Export Dropdown in Sales Finder */
     .export-menu { position: relative; display: inline-block; }
     .export-content { display: none; position: absolute; right: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); min-width: 160px; box-shadow: var(--shadow-md); border-radius: var(--radius-sm); z-index: 10; border: var(--glass-border); overflow: hidden; }
     .export-content button { color: var(--text-main); padding: 10px 16px; text-decoration: none; display: block; width: 100%; text-align: left; border: none; background: transparent; font-size: 0.85rem; font-weight: 800; cursor: pointer; }
@@ -344,9 +318,7 @@
   <!-- Google Translate Hidden Div -->
   <div id="google_translate_element" style="display:none;"></div>
 
-  <!-- ==========================================
-       PLANS MODAL
-       ========================================== -->
+  <!-- PLANS MODAL -->
   <div class="modal-backdrop" id="plansModal">
     <div class="modal-content glass-panel" style="max-width:940px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
@@ -355,7 +327,6 @@
       </div>
       <p style="font-weight:700; color:var(--text-muted); margin-bottom: 20px;">Choose the right operational tier for Ashi Masale enterprise sales & billing.</p>
       
-      <!-- Billing Toggle Switch -->
       <div class="billing-toggle-container">
         <span id="label-monthly" style="color:var(--emerald);">Monthly Billing</span>
         <label class="switch">
@@ -366,7 +337,6 @@
       </div>
 
       <div class="plan-grid">
-        <!-- General Plan -->
         <div class="plan-card">
           <div>
             <h3>General Plan</h3>
@@ -381,7 +351,6 @@
           <button class="btn-secondary" style="width:100%; padding:12px;">Select General</button>
         </div>
         
-        <!-- Premium Plan -->
         <div class="plan-card" style="border: 2px solid var(--primary); box-shadow: var(--shadow-md); transform: scale(1.02); background: rgba(255,255,255,0.75);">
           <div>
             <div style="background:var(--primary); color:#fff; font-size:0.7rem; font-weight:900; text-transform:uppercase; padding:4px 10px; border-radius:6px; margin-bottom:10px; display:inline-block;">Most Popular</div>
@@ -398,7 +367,6 @@
           <button class="btn-primary" style="width:100%; padding:14px;">Select Premium</button>
         </div>
         
-        <!-- Max Plan -->
         <div class="plan-card" style="background: rgba(15, 23, 42, 0.8); color: #fff; border:none;">
           <div>
             <h3 style="color:#fff;">Max Plan</h3>
@@ -411,30 +379,24 @@
               <li>Dedicated Account Manager</li>
             </ul>
           </div>
-          <button class="btn-primary" style="width:100%; background:var(--amber); color:#0f172a; padding:12px;" onclick="alert('Please contact TA Soft Sales Team at sales@tasoft.com')">Contact Sales</button>
+          <button class="btn-primary" style="width:100%; background:var(--amber); color:#0f172a; padding:12px;" onclick="alert('Please contact Flomation Ai Sales Team at sales@flomation-ai.com')">Contact Sales</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ==========================================
-       GLOBAL LOGIN GATE
-       ========================================== -->
+  <!-- GLOBAL LOGIN GATE -->
   <div id="globalLoginScreen" class="no-print">
     <div class="login-box">
       <img src="logo.png" alt="Ashi Logo" style="height:80px; width:auto; object-fit:contain; margin: 0 auto 12px auto; display:block;" onerror="this.src='data:image/svg+xml;utf8,<svg viewBox=\'0 0 160 50\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'><rect width=\'48\' height=\'48\' rx=\'8\' fill=\'%23F59E0B\'/><path d=\'M12 36L24 12L36 36H29.5L24 23.5L18.5 36H12Z\' fill=\'%230F2756\'/><rect x=\'18\' y=\'27\' width=\'12\' height=\'3.5\' rx=\'1.5\' fill=\'%23DC2626\'/></svg>'">
       
       <h2>ASHI MASALE</h2>
-      <p>Sales Portal by TA Soft</p>
+      <p>Sales Portal by Flomation Ai</p>
       
       <div style="display:flex; flex-direction:column; gap:14px;">
         <div>
           <label>Select User Account</label>
           <select id="globalLoginUser" style="font-weight:900; background:rgba(255,255,255,0.7); backdrop-filter:blur(10px); font-size:1rem; padding:12px;">
-            <option value="Admin Desk">Admin Desk (Administrator)</option>
-            <option value="Mohammad Touheed">Mohammad Touheed (Administrator)</option>
-            <option value="Sales Rep">Sales Rep (Sales Agent)</option>
-            <option value="Bilal Ahmad">Hasan Ali (Sales Agent)</option>
           </select>
         </div>
         <div>
@@ -467,8 +429,8 @@
           <svg viewBox="0 0 160 50" fill="none" style="width:100%; height:100%;"><rect width="48" height="48" rx="8" fill="#F59E0B"/><path d="M12 36L24 12L36 36H29.5L24 23.5L18.5 36H12Z" fill="#0F2756"/><rect x="18" y="27" width="12" height="3.5" rx="1.5" fill="#DC2626"/></svg>
         </div>
         <div class="brand-title">
-          <h1>ASHI MASALE (Sales Portal)</h1>
-          <p class="sub-brand">by TA Soft</p>
+          <h1>Sales Portal</h1>
+          <p class="sub-brand">by Flomation Ai</p>
         </div>
       </div>
 
@@ -483,10 +445,10 @@
           </select>
         </div>
 
-        <div class="validity-tag offline-tag no-print" id="offlineCacheStatusIndicator" title="All data is saved locally via Offline Cache DB">🟢 Offline DB Synced</div>
+        <!-- NEW: Dynamic Firebase Connection Indicator -->
+        <div class="validity-tag offline-tag no-print" id="offlineCacheStatusIndicator" title="Syncs locally when offline and pushes to Cloud when online">🔄 Connecting to Firebase...</div>
         <div class="validity-tag no-print" title="Standard Plan Features Enabled">🏆 Standard Plan Activated</div>
 
-        <!-- User Profile Dropdown Menu -->
         <div class="profile-menu-container no-print">
           <button class="profile-trigger-btn" onclick="toggleProfileDropdown()">
             <div class="user-avatar-circle" id="headerAvatar">T</div>
@@ -520,7 +482,6 @@
       </div>
     </header>
 
-    <!-- Reduced Slim Transparent Glassy Animated Ribbon -->
     <div class="ticker-wrap no-print">
       <div class="ticker-move">
         TA Soft - Enterprise Sales App &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp; Pure Spices & Commercial Seasonings &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp; FSSAI Lic. 21418010000270 &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp; TA Soft - Enterprise Sales App &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp; Pure Spices & Commercial Seasonings &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp; FSSAI Lic. 21418010000270
@@ -528,9 +489,7 @@
     </div>
 
     <main class="no-print">
-      <!-- ==========================================
-           VIEW 1: INVOICE BUILDER & SIDE CART
-           ========================================== -->
+      <!-- VIEW 1: INVOICE BUILDER & SIDE CART -->
       <div id="viewCreate">
         <div class="card glass-panel">
           <div class="row-meta">
@@ -562,7 +521,6 @@
         </div>
 
         <div class="grid-builder">
-          <!-- Catalog Browser -->
           <div>
             <div class="card glass-panel" style="padding: 1.2rem;">
               <div class="catalog-top-bar">
@@ -587,7 +545,6 @@
             <div class="catalog-grid" id="catalogGrid"></div>
           </div>
 
-          <!-- Checkout Cart (Side Sticky) -->
           <div>
             <div class="cart-box">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -619,7 +576,7 @@
 
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px;">
                 <button class="btn-secondary" onclick="openInvoicePreviewModal()">Preview & Print</button>
-                <button class="btn-primary" onclick="saveInvoiceRecord()">Save Bill</button>
+                <button class="btn-primary" onclick="saveInvoiceRecord()">Save Bill to Cloud</button>
               </div>
               <button class="btn-whatsapp" onclick="sendInvoiceToCustomerViaWhatsApp()" style="width:100%; margin-top:10px;">WhatsApp Bill</button>
             </div>
@@ -627,31 +584,25 @@
         </div>
       </div>
 
-      <!-- ==========================================
-           VIEW 2: FULL PRODUCT CATALOG PAGE
-           ========================================== -->
+      <!-- VIEW 2: FULL PRODUCT CATALOG PAGE -->
       <div id="viewCatalog" style="display: none;">
         <div class="card glass-panel" style="margin-bottom:1.4rem;">
           <h2 style="font-size:1.4rem; font-weight:900; color:var(--primary); margin-bottom:4px;">Full Product Catalog</h2>
           <p style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">Browse complete commercial spices, packaging weights, and detailed specifications.</p>
           <div class="filter-wrapper" id="bigCategoryPillContainer" style="margin-top:16px;"></div>
         </div>
-        
         <div class="big-catalog-grid" id="bigCatalogGrid"></div>
       </div>
 
-      <!-- ==========================================
-           VIEW 3: SALES FINDER (Tracker + Data Growth)
-           ========================================== -->
+      <!-- VIEW 3: SALES FINDER -->
       <div id="viewHistory" style="display: none;">
         <div style="display:flex; gap:10px; margin-bottom:14px;">
           <button class="btn-primary" id="htab-list" onclick="switchHistoryTab('list')" style="flex:none;">Invoices Tracker</button>
           <button class="btn-secondary" id="htab-analytics" onclick="switchHistoryTab('analytics')" style="flex:none;">Sales Data & Growth</button>
           <div style="flex:1;"></div>
           
-          <!-- Enhanced Export Dropdown for Finder -->
           <div class="export-menu">
-            <button class="btn-secondary">⬇️️ Export Table</button>
+            <button class="btn-secondary">⬇ Export Table</button>
             <div class="export-content">
               <button onclick="exportInvoicesExcel()">📊 Export to Excel</button>
               <button onclick="exportInvoicesCSV()">📝 Export to CSV</button>
@@ -716,9 +667,7 @@
         </div>
       </div>
 
-      <!-- ==========================================
-           VIEW 4: ADMIN PANEL
-           ========================================== -->
+      <!-- VIEW 4: ADMIN PANEL -->
       <div id="viewAdmin" style="display: none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
           <h2 style="font-size:1.4rem; font-weight:900; color:var(--primary);"><span id="adminPageLockIcon">🔒</span> Admin & Configuration Studio</h2>
@@ -729,7 +678,7 @@
           <button class="btn-primary" id="subBtnProducts" onclick="switchAdminSubSection('products')">📦 Category & Product Studio</button>
           <button class="btn-secondary" id="subBtnUsers" onclick="switchAdminSubSection('users')">👥 UAC & Roles</button>
           <button class="btn-secondary" id="subBtnSettings" onclick="switchAdminSubSection('settings')">⚙️ Seal & Catalog Config</button>
-          <button class="btn-secondary" id="subBtnDb" onclick="switchAdminSubSection('db')">💾 Offline Cache & DB</button>
+          <button class="btn-secondary" id="subBtnDb" onclick="switchAdminSubSection('db')">💾 Cloud Cache & Backup</button>
           <button class="btn-secondary" id="subBtnAudit" onclick="switchAdminSubSection('audit')">🛡️ Deep Audit Logs</button>
         </div>
 
@@ -760,7 +709,6 @@
             </div>
             
             <div class="row-meta" style="margin-top:12px; align-items:flex-end;">
-              <!-- New Image Upload Feature -->
               <div style="grid-column:span 2;">
                 <label>Product Image Upload</label>
                 <div style="display:flex; gap:10px; align-items:center;">
@@ -830,11 +778,10 @@
           </div>
         </div>
 
-        <!-- NEW: Offline DB Cache System Area -->
         <div id="adminSection_db" class="admin-section-content" style="display:none;">
             <div class="card glass-panel">
-                <h3 style="font-size:1.1rem; font-weight:900; color:var(--primary); margin-bottom:14px;">Offline Database & Cache Management</h3>
-                <p style="font-size:0.85rem; font-weight:600; margin-bottom:14px; color:var(--text-muted);">All invoice and product data is cached locally on this device. You can export complete backups below.</p>
+                <h3 style="font-size:1.1rem; font-weight:900; color:var(--primary); margin-bottom:14px;">Cloud DB & Cache Management</h3>
+                <p style="font-size:0.85rem; font-weight:600; margin-bottom:14px; color:var(--text-muted);">Invoices are securely synced with Firebase Cloud Firestore. Other assets are cached locally.</p>
                 
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <button class="btn-secondary" onclick="exportInvoicesCSV()">📝 Backup Invoices (CSV)</button>
@@ -844,7 +791,7 @@
                 
                 <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border-solid);">
                     <h4 style="font-size:0.95rem; font-weight:800; color:var(--red); margin-bottom:8px;">Danger Zone</h4>
-                    <button class="btn-danger" onclick="wipeOfflineDB()">⚠️ Wipe Offline Cache DB (Factory Reset)</button>
+                    <button class="btn-danger" onclick="wipeOfflineDB()">⚠️ Wipe Local Catalog & Settings Cache (Factory Reset)</button>
                 </div>
             </div>
         </div>
@@ -867,14 +814,11 @@
     </main>
 
     <footer class="no-print">
-      <div>© 2026 TA Soft Enterprises. All Rights Reserved. | Enterprise portal for ASHI MASALE (Sales Portal).</div>
+      <div>© 2026 Flomation Ai Enterprises. All Rights Reserved. | Enterprise portal for ASHI MASALE (Sales Portal).</div>
     </footer>
   </div>
 
-  <!-- ==========================================
-       MODALS & POPOVERS
-       ========================================== -->
-  <!-- Admin Passcode Auth Modal -->
+  <!-- MODALS -->
   <div class="modal-backdrop" id="adminAuthModal">
     <div class="modal-content modal-sm glass-panel">
       <h3 style="font-size:1.3rem; font-weight:900; color:var(--primary); text-align:center; margin-bottom:14px;">Admin Authentication</h3>
@@ -887,7 +831,6 @@
     </div>
   </div>
 
-  <!-- Product Detail Specification ("See More" Popup) -->
   <div class="modal-backdrop" id="productDetailModal">
     <div class="modal-content modal-md glass-panel">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-solid); padding-bottom:12px; margin-bottom:16px;">
@@ -917,7 +860,6 @@
     </div>
   </div>
 
-  <!-- View Invoice Details Modal -->
   <div class="modal-backdrop" id="viewInvoiceModal">
     <div class="modal-content modal-md glass-panel">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-solid); padding-bottom:12px; margin-bottom:16px;">
@@ -928,7 +870,6 @@
     </div>
   </div>
 
-  <!-- A4 Print Modal (Isolated natively for printing & PDF Export) -->
   <div class="modal-backdrop" id="invoicePreviewModal">
     <div class="modal-content glass-panel" style="background:rgba(255,255,255,0.95); border:none; border-radius:0;">
       <div class="no-print" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
@@ -1030,9 +971,7 @@
 
   <div class="toast" id="appToast">Notification</div>
 
-  <!-- ==========================================
-       JAVASCRIPT SYSTEM ENGINE
-       ========================================== -->
+  <!-- JAVASCRIPT SYSTEM ENGINE -->
   <script>
     const INITIAL_CATALOG = [
       { id: 1, category: "Biryani Masala", name: "Bombay Biryani Spice Mix", weight: "60gm", rate: 35, mrp: 55, hsn: "0910", desc: "Classic aromatic Bombay style biryani seasoning.", ingredients: "Cumin, Coriander, Black Cardamom, Cloves", img: "Ashi bmby bryn.jpg" },
@@ -1052,7 +991,6 @@
       { id: 4, name: "Bilal Ahmad", role: "Sales Agent", territory: "Shahjahanabad" }
     ];
 
-    /* DATA INIT */
     let catalog = JSON.parse(localStorage.getItem("ASHI_CATALOG") || "null") || INITIAL_CATALOG;
     let categories = JSON.parse(localStorage.getItem("ASHI_CATEGORIES") || "null") || ["Biryani Masala", "Chicken Masala", "Meat Masala", "Fry Masala", "Custards"];
     let users = JSON.parse(localStorage.getItem("ASHI_USERS") || "null") || DEFAULT_USERS;
@@ -1066,7 +1004,9 @@
     let isAdminAuthenticated = false;
     let cart = [];
     let selectedCategory = "All";
-    let invoices = JSON.parse(localStorage.getItem("ASHI_INVOICES") || "[]");
+    
+    // Invoices are now entirely managed via Firebase.
+    let invoices = []; 
     let auditLogs = JSON.parse(localStorage.getItem("ASHI_AUDIT") || "[]");
     let hideCatalogPrice = localStorage.getItem("ASHI_HIDE_CATALOG_PRICE") === "true";
     let customSignature = localStorage.getItem("ASHI_SIGNATURE") || "";
@@ -1075,11 +1015,61 @@
     const pageSize = 8;
     let filteredInvoicesList = [];
 
-    // App Startup
+    // -------------------------------------------------------------
+    // FIREBASE INITIALIZATION & SYNC
+    // -------------------------------------------------------------
+    let db, collection, doc, setDoc, onSnapshot;
+
+    async function initFirebase() {
+        // Dynamically import Firebase Modular SDK to maintain compatibility with inline JS functions
+        const fbApp = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js");
+        const fbFs = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDTf6e9_jFIC75odETppxtA_fNOHOKn3jE",
+            authDomain: "ashi-masale-portal.firebaseapp.com",
+            projectId: "ashi-masale-portal",
+            storageBucket: "ashi-masale-portal.firebasestorage.app",
+            messagingSenderId: "114911499309",
+            appId: "1:114911499309:web:5079913779e37a15b794a4",
+            measurementId: "G-MSTN3TJ0EH"
+        };
+        
+        const app = fbApp.initializeApp(firebaseConfig);
+        db = fbFs.initializeFirestore(app, { localCache: fbFs.persistentLocalCache() });
+        collection = fbFs.collection;
+        doc = fbFs.doc;
+        setDoc = fbFs.setDoc;
+        onSnapshot = fbFs.onSnapshot;
+
+        // Real-time offline-first listener for Invoices
+        onSnapshot(collection(db, "invoices"), (snapshot) => {
+            const cloudInvoices = [];
+            snapshot.forEach((d) => cloudInvoices.push(d.data()));
+            cloudInvoices.sort((a, b) => new Date(b.date) - new Date(a.date));
+            invoices = cloudInvoices;
+            
+            const statusIndicator = document.getElementById("offlineCacheStatusIndicator");
+            if (snapshot.metadata.fromCache) {
+                statusIndicator.innerText = "🟡 Offline DB Cached";
+                statusIndicator.classList.remove("offline-tag");
+            } else {
+                statusIndicator.innerText = "🟢 Live Cloud Synced";
+                statusIndicator.classList.add("offline-tag");
+            }
+            
+            // Re-render UI if on history tab
+            if (document.getElementById('viewHistory').style.display === 'block') {
+               applyFinderFilters();
+            }
+        });
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
       initUsers();
       checkGlobalAuthentication();
       applySettingsOnLoad();
+      initFirebase();
     });
 
     function showToast(msg) {
@@ -1119,9 +1109,6 @@
       enforceUacVisibility();
     }
 
-    /* -------------------------------------------------------------
-       LOGIN & PROFILE MENU
-       ------------------------------------------------------------- */
     function initUsers() {
       if (!users || !users.length) {
         users = DEFAULT_USERS;
@@ -1194,7 +1181,6 @@
       document.getElementById("plansModal").classList.remove("open");
     }
 
-    /* Billing Cycle Toggle */
     function toggleBillingCycle() {
       const isAnnual = document.getElementById("billingToggle").checked;
       const pGen = document.getElementById("price-general");
@@ -1220,9 +1206,6 @@
       if (s) { s.value = lang; s.dispatchEvent(new Event("change")); }
     }
 
-    /* -------------------------------------------------------------
-       ADMIN PERMISSIONS & LOCK STATUS
-       ------------------------------------------------------------- */
     function enforceUacVisibility() {
       const u = users.find(x => x.name === activeUser);
       const btnAdmin = document.getElementById("tabBtnAdmin");
@@ -1280,9 +1263,6 @@
       showToast("Admin session locked.");
     }
 
-    /* -------------------------------------------------------------
-       CATALOG & PRODUCTS RENDERING
-       ------------------------------------------------------------- */
     function renderCategoryPills() {
       const arr = ["All", ...categories];
       const html = arr.map(c => `<button class="pill-btn ${selectedCategory===c?'active':''}" onclick="filterByCategory('${c}')">${c}</button>`).join("");
@@ -1388,9 +1368,6 @@
     }
     function closeProductDetailModal() { document.getElementById("productDetailModal").classList.remove("open"); }
 
-    /* -------------------------------------------------------------
-       CART & BILLING COMPUTATION
-       ------------------------------------------------------------- */
     function addToCart(productId) {
       const pId = Number(productId);
       const p = catalog.find(x => Number(x.id) === pId);
@@ -1495,18 +1472,21 @@
       document.getElementById("sumGrandTotal").innerText = `₹${grandTotal.toFixed(2)}`;
     }
 
-    /* -------------------------------------------------------------
-       INVOICE SAVE, EXPORT & PRINT
-       ------------------------------------------------------------- */
     function resetInvoiceForm() {
       const seed = Math.floor(1000 + Math.random() * 9000);
       document.getElementById("invNoInput").value = `ASHI-${new Date().getFullYear()}-${seed}`;
       document.getElementById("invDateInput").value = new Date().toISOString().split("T")[0];
     }
 
-    function saveInvoiceRecord() {
+    // UPDATED FIREBASE CLOUD SAVE FUNCTION
+    async function saveInvoiceRecord() {
       if (!cart.length) {
         alert("Cannot save an empty invoice.");
+        return;
+      }
+
+      if (!db) {
+        alert("Database connection is initializing. Please wait a moment.");
         return;
       }
 
@@ -1533,24 +1513,27 @@
         items: [...cart]
       };
 
-      const existingIdx = invoices.findIndex(x => x.invoiceNo === invNo);
-      if (existingIdx > -1) invoices[existingIdx] = record;
-      else invoices.unshift(record);
+      try {
+        // Send data directly to Cloud Firestore
+        const docRef = doc(db, "invoices", record.invoiceNo);
+        await setDoc(docRef, record);
+        
+        recordAudit("INVOICE_SAVED", invNo, `Saved invoice for ${record.firm} (₹${record.grandTotal})`);
 
-      localStorage.setItem("ASHI_INVOICES", JSON.stringify(invoices));
-      recordAudit("INVOICE_SAVED", invNo, `Saved invoice for ${record.firm} (₹${record.grandTotal})`);
+        cart = [];
+        resetInvoiceForm();
+        calculateCartTotals();
+        document.getElementById("custFirmInput").value = "";
+        document.getElementById("custPhoneInput").value = "";
+        document.getElementById("custNameInput").value = "";
+        document.getElementById("invPaymentRef").value = "";
+        document.getElementById("gstToggle").checked = false;
 
-      cart = [];
-      resetInvoiceForm();
-      calculateCartTotals();
-      document.getElementById("custFirmInput").value = "";
-      document.getElementById("custPhoneInput").value = "";
-      document.getElementById("custNameInput").value = "";
-      document.getElementById("invPaymentRef").value = "";
-      document.getElementById("gstToggle").checked = false;
-
-      showMiniPopup("Invoice Saved", `Invoice #${invNo} stored securely offline.`);
-      applyFinderFilters();
+        showMiniPopup("Invoice Saved", `Invoice #${invNo} synced securely to Cloud.`);
+      } catch (error) {
+        console.error("Firestore Write Error: ", error);
+        alert("Failed to save invoice to the database.");
+      }
     }
 
     function openInvoicePreviewModal() {
@@ -1643,7 +1626,6 @@
       window.open(`https://api.whatsapp.com/send?phone=91${phone.slice(-10)}&text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    /* --- EXPORT FUNCTIONS (PDF, EXCEL, CSV, JSON) --- */
     function getExportData() {
         return filteredInvoicesList && filteredInvoicesList.length ? filteredInvoicesList : invoices;
     }
@@ -1688,8 +1670,6 @@
         if (typeof html2pdf === 'undefined') return alert("PDF library is still loading. Please try again in a moment.");
         const invNo = document.getElementById("invNoInput").value;
         const element = document.getElementById('invoicePrintView');
-        
-        // Force display block so html2pdf can render the canvas properly
         element.style.display = 'block'; 
         
         const opt = {
@@ -1701,7 +1681,7 @@
         };
 
         html2pdf().set(opt).from(element).save().then(() => {
-            element.style.display = 'none'; // Hide it back after generation
+            element.style.display = 'none';
             showToast("PDF Invoice Downloaded.");
         });
     }
@@ -1723,17 +1703,13 @@
     }
 
     function wipeOfflineDB() {
-        if (confirm("DANGER ZONE: This will permanently wipe all offline invoices, products, categories, and users from this device. Proceed?")) {
+        if (confirm("DANGER ZONE: This will permanently wipe all offline local settings, products, categories, and users from this device. Proceed?")) {
             localStorage.clear();
             alert("Offline Database wiped. Application will now reload to factory settings.");
             location.reload();
         }
     }
 
-
-    /* -------------------------------------------------------------
-       FINDER, TABS & ANALYTICS
-       ------------------------------------------------------------- */
     function switchHistoryTab(tab) {
       document.getElementById('hview-list').style.display = tab === 'list' ? 'block' : 'none';
       document.getElementById('hview-analytics').style.display = tab === 'analytics' ? 'block' : 'none';
@@ -1877,9 +1853,6 @@
       cx.stroke();
     }
 
-    /* -------------------------------------------------------------
-       ADMIN FUNCTIONS (Settings, Products, Uploads & Signatures)
-       ------------------------------------------------------------- */
     function applySettingsOnLoad() {
       document.getElementById("settingHidePrice").checked = hideCatalogPrice;
       if (customSignature) {
@@ -1955,7 +1928,6 @@
       if (uTb) uTb.innerHTML = users.map(u => `<tr><td>${u.name}</td><td>${u.role}</td><td>${u.territory || 'HQ'}</td><td style="text-align:right;">${users.length > 1 ? `<button class="btn-danger" style="padding:4px 8px; font-size:0.75rem;" onclick="deleteUser(${u.id})">Del</button>` : 'Primary'}</td></tr>`).join("");
     }
 
-    /* --- IMAGE ENCODING FOR NEW PRODUCTS --- */
     function encodeProductImage(input) {
       const file = input.files[0];
       if (file) {
@@ -1974,7 +1946,6 @@
       const rate = parseFloat(document.getElementById("newProdRate").value);
       if (!name || isNaN(rate)) return alert("Name and wholesale rate required.");
       
-      // Get base64 string or fallback to default
       const base64Img = document.getElementById("newProdImgBase64").value || "logo.png";
 
       const p = {
@@ -2046,9 +2017,6 @@
       calculateCartTotals();
     }
 
-    /* -------------------------------------------------------------
-       NAVIGATION & TABS
-       ------------------------------------------------------------- */
     function switchTab(t) {
       if (t === 'admin' && !isAdminAuthenticated) {
         attemptAdminAccess();
