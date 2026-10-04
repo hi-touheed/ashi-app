@@ -1050,9 +1050,14 @@
             invoices = cloudInvoices;
             
             const statusIndicator = document.getElementById("offlineCacheStatusIndicator");
-            if (snapshot.metadata.fromCache) {
-                statusIndicator.innerText = "🟡 Offline DB Cached";
+            
+            // Check pending writes and browser connection
+            if (!navigator.onLine) {
+                statusIndicator.innerText = "🔴 Offline Mode (Local DB)";
                 statusIndicator.classList.remove("offline-tag");
+            } else if (snapshot.metadata.hasPendingWrites) {
+                statusIndicator.innerText = "🔄 Syncing to Cloud...";
+                statusIndicator.classList.remove("offline-tag"); // Optional: style syncing state differently
             } else {
                 statusIndicator.innerText = "🟢 Live Cloud Synced";
                 statusIndicator.classList.add("offline-tag");
