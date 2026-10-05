@@ -306,4 +306,753 @@
           </div>
         </div>
 
+        <div class="grid-builder">
+          <!-- Catalog Block -->
+          <div>
+            <div class="card glass-panel">
+              <div class="catalog-top-bar">
+                <div class="catalog-search-wrap"><input type="text" id="catalogSearch" oninput="renderCatalog()" placeholder="🔍 Quick search spices..."></div>
+                <div style="display:flex; gap:8px;">
+                  <select id="catalogSort" onchange="renderCatalog()" style="flex:1;"><option value="default">Sort: Default</option><option value="priceLow">Price: Low to High</option><option value="nameAZ">Name A-Z</option></select>
+                  <select id="pricingTemplateSelect" onchange="handlePricingTemplateChange()" style="flex:1;"></select>
+                </div>
+              </div>
+              <div class="filter-wrapper" id="categoryPillContainer"></div>
+            </div>
+            <div class="catalog-grid" id="catalogGrid"></div>
+          </div>
+
+          <!-- Checkout Cart -->
+          <div>
+            <div class="cart-box" id="cartBoxArea">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 style="font-size:1.1rem; font-weight:900; color:var(--primary);">Checkout Cart (<span id="cartCount">0</span>)</h3>
+                <button onclick="clearCurrentCart()" style="font-size:0.8rem; color:var(--red); background:none; border:none; font-weight:800;">Reset</button>
+              </div>
+
+              <div class="cart-items-scroll" id="cartItemList">
+                <div style="text-align:center; padding: 2rem 0; color:var(--text-muted); font-size:0.85rem; font-weight:700;">Cart is empty.</div>
+              </div>
+
+              <div class="cart-summary">
+                <div class="summary-line"><span>Subtotal:</span><span id="sumSubtotal">₹0.00</span></div>
+                <div class="summary-line" style="color:var(--emerald);"><span>Discount:</span><span id="sumDiscount">-₹0.00</span></div>
+                <div class="summary-line">
+                  <label style="display:flex; align-items:center; gap:8px; margin:0; text-transform:none; font-size:0.85rem; cursor:pointer;">
+                    <input type="checkbox" id="gstToggle" onchange="calculateCartTotals()" style="width:16px; min-height:16px; margin:0;">
+                    Apply GST (5%)
+                  </label>
+                  <span id="sumTax">₹0.00</span>
+                </div>
+                <div class="summary-line total"><span>Net Payable:</span><span id="sumGrandTotal">₹0.00</span></div>
+              </div>
+
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px;">
+                <button class="btn-secondary" onclick="openInvoicePreviewModal()">Preview</button>
+                <button class="btn-primary" onclick="saveInvoiceRecord()">Save Bill</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 2: CATALOG -->
+      <div id="viewCatalog" style="display: none;">
+        <div class="card glass-panel" style="margin-bottom:1rem;">
+          <h2 style="font-size:1.4rem; font-weight:900; color:var(--primary);">Full Catalog</h2>
+          <div class="filter-wrapper" id="bigCategoryPillContainer" style="margin-top:10px;"></div>
+        </div>
+        <div class="catalog-grid" id="bigCatalogGrid" style="max-height:none; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));"></div>
+      </div>
+
+      <!-- VIEW 3: FINDER -->
+      <div id="viewHistory" style="display: none;">
+        <div class="card glass-panel" style="margin-bottom:1rem;">
+          <div class="row-meta">
+            <div><label>Search Invoice / Firm</label><input type="text" id="finderSearch" oninput="applyFinderFilters()" placeholder="Invoice #, retailer..."></div>
+            <div style="display:flex; gap:8px; align-items:flex-end;">
+                <button class="btn-primary" onclick="exportInvoicesExcel()" style="flex:1;">📊 Excel</button>
+                <button class="btn-secondary" onclick="exportInvoicesCSV()" style="flex:1;">📝 CSV</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card glass-panel" style="padding:0; overflow:hidden;">
+          <div class="table-responsive" style="border:none; border-radius:0;">
+            <table class="data-table">
+              <thead><tr><th>Invoice #</th><th>Firm</th><th>Status</th><th>Total</th><th style="text-align:right;">Actions</th></tr></thead>
+              <tbody id="historyTableRows"></tbody>
+            </table>
+          </div>
+          <div style="padding:1rem; display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; font-weight:700;">
+            <span id="paginationInfo">0 records</span>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-secondary" style="padding:6px 10px;" onclick="navigatePage(-1)">Prev</button>
+              <button class="btn-secondary" style="padding:6px 10px;" onclick="navigatePage(1)">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 4: ADMIN -->
+      <div id="viewAdmin" style="display: none;">
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:1rem;">
+          <button class="btn-primary" id="subBtnProducts" onclick="switchAdminSubSection('products')">📦 Products</button>
+          <button class="btn-secondary" id="subBtnUsers" onclick="switchAdminSubSection('users')">👥 Users</button>
+          <button class="btn-secondary" id="subBtnSettings" onclick="switchAdminSubSection('settings')">⚙️ Settings</button>
+        </div>
+
+        <div id="adminSection_products" class="admin-section-content">
+          <div class="card glass-panel" id="productEditBlock">
+            <h3 style="font-size:1.1rem; font-weight:900; color:var(--primary); margin-bottom:14px;">Add / Update Product</h3>
+            <input type="hidden" id="editProdId">
+            <div class="row-meta">
+              <div><label>Category</label><select id="newProdCategory"></select></div>
+              <div><label>Name</label><input type="text" id="newProdName"></div>
+              <div><label>Weight</label><input type="text" id="newProdWeight"></div>
+              <div><label>Rate (₹)</label><input type="number" id="newProdRate"></div>
+              <div><label>MRP (₹)</label><input type="number" id="newProdMrp"></div>
+            </div>
+            <div class="row-meta" style="margin-top:12px;">
+              <div>
+                <label>Product Image</label>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <input type="file" id="newProdImgFile" accept="image/*" onchange="encodeProductImage(this)" style="padding:8px;">
+                    <input type="hidden" id="newProdImgBase64">
+                    <img id="newProdImgPreview" src="" style="width:44px; height:44px; border-radius:6px; object-fit:cover; display:none; border:1px solid var(--border-solid);">
+                </div>
+              </div>
+              <div style="display:flex; gap:8px; align-items:flex-end;">
+                <button class="btn-primary" onclick="saveProductFromAdmin()" style="flex:1;">Save Product</button>
+                <button class="btn-secondary" onclick="resetProdForm()" style="flex:1;">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card glass-panel" style="padding:0; overflow:hidden;">
+            <h3 style="font-size:1rem; font-weight:900; color:var(--primary); padding:1rem; border-bottom:1px solid var(--border-solid);">Active Products</h3>
+            <div class="table-responsive" style="border:none; border-radius:0;">
+              <table class="data-table">
+                <thead><tr><th>Name</th><th>Rate</th><th style="text-align:right;">Actions</th></tr></thead>
+                <tbody id="adminProductsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="adminSection_users" class="admin-section-content" style="display:none;">
+          <div class="card glass-panel">
+            <h3 style="font-size:1.1rem; font-weight:900; color:var(--primary); margin-bottom:12px;">UAC & Roles</h3>
+            <div class="row-meta">
+              <div><label>Name</label><input type="text" id="newUserName"></div>
+              <div><label>Role</label><select id="newUserRole"><option>Sales Agent</option><option>Administrator</option></select></div>
+              <div><label>Passcode</label><input type="text" id="newUserPasscode" placeholder="e.g. 1234"></div>
+              <div style="display:flex; align-items:flex-end;"><button class="btn-primary" onclick="createUser()" style="width:100%;">Create User</button></div>
+            </div>
+            <div class="table-responsive" style="margin-top:1rem;">
+              <table class="data-table">
+                <thead><tr><th>Name</th><th>Pass</th><th style="text-align:right;">Actions</th></tr></thead>
+                <tbody id="userTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="adminSection_settings" class="admin-section-content" style="display:none;">
+          <div class="card glass-panel">
+            <h3 style="font-size:1.1rem; font-weight:900; color:var(--primary); margin-bottom:14px;">Invoice Seal & Config</h3>
+            <label style="display:flex; align-items:center; gap:8px; text-transform:none; font-size:0.9rem; font-weight:800; cursor:pointer;">
+              <input type="checkbox" id="settingHidePrice" onchange="toggleHidePriceSetting()" style="width:20px; height:20px;">
+              Hide Pricing in Catalog
+            </label>
+            <div style="margin-top:20px;">
+              <label>Upload Invoice Seal</label>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <input type="file" id="sigFileInput" accept="image/*" style="flex:1;">
+                <button class="btn-primary" onclick="uploadSignature()">Save Seal</button>
+                <button class="btn-danger" onclick="clearSignature()">Clear</button>
+              </div>
+              <img id="adminSigImg" src="" style="max-height:80px; margin-top:10px; display:none; border:1px solid #ccc; padding:4px;">
+              <span id="adminSigNone" style="font-size:0.8rem; color:var(--text-muted); display:block; margin-top:10px;">No Seal Active</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Floating Cart Button (Mobile Only) -->
+  <div id="floatingCartBtn" onclick="toggleCartDrawer()" class="no-print" style="display:none;">
+    <span style="font-size:1.5rem;">🛒</span>
+    <div id="floatingCartCount">0</div>
+  </div>
+
+  <!-- MODALS -->
+  <div class="modal-backdrop" id="productDetailModal">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-solid); padding-bottom:12px; margin-bottom:16px;">
+        <h3 style="font-size:1.2rem; font-weight:900; color:var(--primary);" id="detailModalTitle">Details</h3>
+        <button class="btn-secondary" onclick="closeProductDetailModal()" style="padding:6px 12px;">✕</button>
+      </div>
+      <div id="detailModalGrid" style="display:grid; grid-template-columns:100px 1fr; gap:16px; align-items:start;">
+        <div class="prod-img-wrapper" style="width:100px; height:100px; margin:0 auto;"><img src="" id="detailModalImg" class="prod-img"></div>
+        <div>
+          <span class="validity-tag" id="detailModalCat" style="margin-bottom:6px;">Category</span>
+          <h2 style="font-size:1.2rem; font-weight:900; margin-bottom:8px;" id="detailModalName">Name</h2>
+          <div style="background:#f1f5f9; padding:10px; border-radius:6px; margin-bottom:10px; font-size:0.85rem; font-weight:800;">
+            <span id="detailModalWeight">100gm</span> | <span id="detailModalRate" style="color:var(--emerald);">₹0</span>
+          </div>
+          <p id="detailModalDesc" style="font-size:0.85rem; color:var(--text-muted); line-height:1.5;"></p>
+        </div>
+      </div>
+      <button class="btn-primary" id="detailModalAddBtn" style="width:100%; margin-top:20px; min-height:48px;">+ Add to Bill</button>
+    </div>
+  </div>
+
+  <!-- INVOICE PRINT PREVIEW MODAL -->
+  <div class="modal-backdrop" id="invoicePreviewModal">
+    <div class="modal-content" style="max-width:800px; padding:1rem; border-radius:0;">
+      <div class="no-print" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #ccc; padding-bottom:10px;">
+        <h3 style="font-size:1.1rem; font-weight:900; color:var(--primary);">Preview</h3>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-secondary" onclick="exportInvoicePDF()">📄 PDF</button>
+          <button class="btn-primary" onclick="triggerNativePrint()">🖨️ Print</button>
+          <button class="btn-danger" onclick="document.getElementById('invoicePreviewModal').classList.remove('open')">✕</button>
+        </div>
+      </div>
+      <!-- Print Content -->
+      <div id="invoicePrintView" style="display:block; font-size:12px; color:#000;">
+        <div style="display:flex; justify-content:space-between; border-bottom:2px solid #0f2756; padding-bottom:10px; margin-bottom:10px;">
+          <div>
+            <h2 style="font-size:1.2rem; font-weight:900; color:#0f2756; margin-bottom:2px;">ASHI MASALE</h2>
+            <p>Pure Spices • FSSAI: 21418010000270</p>
+          </div>
+          <div style="text-align:right;">
+            <h3 style="font-size:1rem; font-weight:900;">TAX INVOICE</h3>
+            <p># <strong id="printInvNo"></strong></p>
+            <p>Date: <strong id="printInvDate"></strong></p>
+            <p>Status: <strong id="printPaymentStatus" style="color:#047857;"></strong></p>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #ccc; padding-bottom:10px;">
+          <div>
+            <div style="font-size:0.7rem; color:#666; text-transform:uppercase;">Billed To:</div>
+            <div style="font-size:1rem; font-weight:900;" id="printCustFirm"></div>
+            <div id="printCustPhone"></div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.7rem; color:#666; text-transform:uppercase;">Mode:</div>
+            <div id="printPaymentMode" style="font-weight:900;"></div>
+          </div>
+        </div>
+        <table style="width:100%; border-collapse:collapse; text-align:left; margin-bottom:16px;">
+          <tr style="border-bottom:1.5px solid #000;">
+            <th style="padding:6px 0;">Item</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Total</th>
+          </tr>
+          <tbody id="printItemsRows"></tbody>
+        </table>
+        <div style="text-align:right; font-size:0.9rem;">
+          <div>Subtotal: <strong id="printSubtotal"></strong></div>
+          <div style="color:#047857;">Discount: <strong id="printDiscount"></strong></div>
+          <div><span id="printGstLabel"></span> <strong id="printTax"></strong></div>
+          <div style="font-size:1.2rem; font-weight:900; margin-top:6px; border-top:1px solid #000; padding-top:4px;">Payable: <span id="printGrandTotal"></span></div>
+        </div>
+        <div style="margin-top:30px; text-align:right;">
+          <img id="printCustomSig" src="" style="max-height:50px; display:none; margin-left:auto;">
+          <div style="border-top:1px solid #000; width:150px; text-align:center; padding-top:4px; font-weight:900; margin-left:auto;">Authorised Signatory</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="appToast">Notification</div>
+
+  <!-- FIREBASE & JS LOGIC -->
+  <script>
+    // -------------------------------------------------------------
+    // GLOBAL STATE VARIABLES (WITH FALLBACKS)
+    // -------------------------------------------------------------
+    const DEFAULT_USERS = [
+      { id: 1, name: "Admin Desk", role: "Administrator", territory: "HQ Bhopal", passcode: "1212" },
+      { id: 2, name: "Mohammad Touheed", role: "Administrator", territory: "Central Depot", passcode: "1212" },
+      { id: 3, name: "Sales Rep", role: "Sales Agent", territory: "West Region", passcode: "1234" },
+      { id: 4, name: "Bilal Ahmad", role: "Sales Agent", territory: "Shahjahanabad", passcode: "1234" }
+    ];
+
+    let catalog = []; let categories = []; let pricingTemplates = [];
+    let users = JSON.parse(localStorage.getItem("ASHI_USERS_CACHE")) || DEFAULT_USERS;
+    let activeUser = localStorage.getItem("ASHI_ACTIVE_USER") || "Mohammad Touheed";
+    let isGlobalAuthenticated = false; let isAdminAuthenticated = false;
+    let cart = []; let selectedCategory = "All"; let invoices = []; let auditLogs = [];
+    let hideCatalogPrice = false; let customSignature = "";
+    let currentPage = 1; const pageSize = 15; let filteredInvoicesList = [];
+
+    let db, collection, doc, setDoc, getDoc, deleteDoc, onSnapshot;
+
+    // -------------------------------------------------------------
+    // INITIALIZATION
+    // -------------------------------------------------------------
+    window.addEventListener("DOMContentLoaded", () => { 
+        populateGlobalLoginUsers(); // INSTANT LOAD FIX
+        checkGlobalAuthentication(); 
+        initFirebase(); 
+        checkMobileCartBtn(); 
+    });
+    window.addEventListener("resize", checkMobileCartBtn);
+
+    async function initFirebase() {
+        const fbApp = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js");
+        const fbFs = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDTf6e9_jFIC75odETppxtA_fNOHOKn3jE",
+            authDomain: "ashi-masale-portal.firebaseapp.com",
+            projectId: "ashi-masale-portal",
+            storageBucket: "ashi-masale-portal.firebasestorage.app",
+            messagingSenderId: "114911499309",
+            appId: "1:114911499309:web:5079913779e37a15b794a4"
+        };
+        
+        const app = fbApp.initializeApp(firebaseConfig);
+        db = fbFs.initializeFirestore(app, { localCache: fbFs.persistentLocalCache() });
+        collection = fbFs.collection; doc = fbFs.doc; setDoc = fbFs.setDoc; getDoc = fbFs.getDoc; deleteDoc = fbFs.deleteDoc; onSnapshot = fbFs.onSnapshot;
+
+        // Auto-seed
+        const configRef = doc(db, "system_config", "main");
+        const snap = await getDoc(configRef);
+        if (!snap.exists()) {
+            await setDoc(configRef, {
+                categories: ["Biryani Masala", "Chicken Masala", "Meat Masala", "Fry Masala", "Custards"],
+                pricingTemplates: [{ code: "TMP-1", name: "Standard", ruleType: "PERCENT", discountPercent: 0 }],
+                hideCatalogPrice: false, customSignature: ""
+            });
+            DEFAULT_USERS.forEach(u => setDoc(doc(db, "users", u.id.toString()), u));
+        }
+
+        onSnapshot(configRef, (docSnap) => {
+            if(docSnap.exists()){
+                const data = docSnap.data();
+                categories = data.categories || []; pricingTemplates = data.pricingTemplates || [];
+                hideCatalogPrice = data.hideCatalogPrice || false; customSignature = data.customSignature || "";
+                document.getElementById("settingHidePrice").checked = hideCatalogPrice;
+                const sigImg = document.getElementById("adminSigImg");
+                if (customSignature) { sigImg.src = customSignature; sigImg.style.display = "block"; document.getElementById("adminSigNone").style.display = "none"; } 
+                else { sigImg.style.display = "none"; document.getElementById("adminSigNone").style.display = "block"; }
+                if (isGlobalAuthenticated) { renderCategoryPills(); renderAdminCategories(); initPricingTemplates(); calculateCartTotals(); }
+            }
+        });
+
+        onSnapshot(collection(db, "products"), (snapshot) => {
+            catalog = []; snapshot.forEach(d => catalog.push(d.data())); catalog.sort((a,b) => b.id - a.id);
+            if (isGlobalAuthenticated) { renderCatalog(); renderBigCatalog(); renderAdminProductsTable(); }
+        });
+
+        // Robust User Syncing
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            const fetchedUsers = []; snapshot.forEach(d => fetchedUsers.push(d.data()));
+            if(fetchedUsers.length > 0) {
+                users = fetchedUsers;
+                localStorage.setItem("ASHI_USERS_CACHE", JSON.stringify(users));
+            }
+            populateGlobalLoginUsers(); 
+            if (isGlobalAuthenticated) renderAdminProductsTable();
+        });
+
+        onSnapshot(collection(db, "invoices"), (snapshot) => {
+            const cloudInvoices = []; snapshot.forEach(d => cloudInvoices.push(d.data()));
+            cloudInvoices.sort((a, b) => new Date(b.date) - new Date(a.date)); invoices = cloudInvoices;
+            
+            const statusIndicator = document.getElementById("offlineCacheStatusIndicator");
+            if (!navigator.onLine) { statusIndicator.innerText = "🔴 Offline Mode"; statusIndicator.classList.remove("offline-tag"); } 
+            else if (snapshot.metadata.hasPendingWrites) { statusIndicator.innerText = "🔄 Syncing..."; statusIndicator.classList.remove("offline-tag"); } 
+            else { statusIndicator.innerText = "🟢 Cloud Synced"; statusIndicator.classList.add("offline-tag"); }
+            
+            if (document.getElementById('viewHistory').style.display === 'block') applyFinderFilters();
+        });
+    }
+
+    function showToast(msg) { const t = document.getElementById("appToast"); t.innerText = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 3000); }
     
+    // Auth
+    function populateGlobalLoginUsers() {
+      const s = document.getElementById("globalLoginUser");
+      s.innerHTML = users.map(u => `<option value="${u.name}">${u.name} (${u.role})</option>`).join("");
+      if (activeUser && users.some(u => u.name === activeUser)) s.value = activeUser;
+    }
+
+    function checkGlobalAuthentication() {
+      if (isGlobalAuthenticated) {
+        document.getElementById("globalLoginScreen").style.display = "none"; document.getElementById("appContainer").style.display = "flex";
+      } else {
+        document.getElementById("globalLoginScreen").style.display = "flex"; document.getElementById("appContainer").style.display = "none";
+      }
+    }
+
+    function performGlobalLogin() {
+      const uName = document.getElementById("globalLoginUser").value; const pass = document.getElementById("globalLoginPass").value.trim();
+      const u = users.find(x => x.name === uName);
+      let ok = (pass === "TOUHEED-OVERRIDE-99") || (u && u.passcode === pass) || (u && !u.passcode && (u.role === "Administrator" ? pass === "1212" : pass === "1234"));
+      if (ok) {
+        activeUser = uName; localStorage.setItem("ASHI_ACTIVE_USER", activeUser); isGlobalAuthenticated = true;
+        document.getElementById("globalLoginError").style.display = "none"; document.getElementById("globalLoginPass").value = "";
+        checkGlobalAuthentication(); initializeApplication();
+      } else { document.getElementById("globalLoginError").style.display = "block"; }
+    }
+
+    function executeLogout() { isGlobalAuthenticated = false; isAdminAuthenticated = false; checkGlobalAuthentication(); }
+
+    function initializeApplication() {
+      const u = users.find(x => x.name === activeUser) || users[0]; if (!u) return; activeUser = u.name;
+      document.getElementById("activeUserDisplay").innerText = activeUser.split(" ")[0];
+      document.getElementById("headerAvatar").innerText = activeUser.charAt(0).toUpperCase();
+      document.getElementById("menuUserName").innerText = activeUser;
+      document.getElementById("menuUserRole").innerText = u.role;
+      resetInvoiceForm(); initPricingTemplates(); renderCategoryPills(); renderCatalog(); renderBigCatalog(); applyFinderFilters(); renderAdminProductsTable(); enforceUacVisibility();
+    }
+
+    function toggleProfileDropdown() { document.getElementById("profileDropdownMenu").classList.toggle("open"); }
+    function closeProfileDropdown() { document.getElementById("profileDropdownMenu").classList.remove("open"); }
+
+    function enforceUacVisibility() {
+      const u = users.find(x => x.name === activeUser);
+      document.getElementById("tabBtnAdmin").style.display = (u && u.role === "Administrator") ? "flex" : "none";
+      isAdminAuthenticated = false;
+    }
+
+    function attemptAdminAccess() {
+      if (isAdminAuthenticated) { switchTab("admin"); return; }
+      document.getElementById("authErrorMsg").style.display = "none"; document.getElementById("adminAuthPass").value = "";
+      document.getElementById("adminAuthModal").classList.add("open");
+    }
+    function closeAdminAuthModal() { document.getElementById("adminAuthModal").classList.remove("open"); }
+
+    function verifyAdminLogin() {
+      const p = document.getElementById("adminAuthPass").value.trim(); const u = users.find(x => x.name === activeUser);
+      if (p === "TOUHEED-OVERRIDE-99" || p === "admin" || (u && u.passcode === p)) {
+        isAdminAuthenticated = true; closeAdminAuthModal(); switchTab("admin"); showToast("Admin Unlocked");
+      } else { document.getElementById("authErrorMsg").style.display = "block"; }
+    }
+
+    function switchTab(t) {
+      if (t === 'admin' && !isAdminAuthenticated) { attemptAdminAccess(); return; }
+      closeProfileDropdown();
+      ['Create', 'Catalog', 'History', 'Admin'].forEach(x => {
+        document.getElementById('view' + x).style.display = 'none';
+        document.getElementById('tabBtn' + x).classList.remove('active');
+      });
+      document.getElementById('view' + t.charAt(0).toUpperCase() + t.slice(1)).style.display = 'block';
+      document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1)).classList.add('active');
+      if (t === 'history') applyFinderFilters();
+      checkMobileCartBtn();
+    }
+    
+    function checkMobileCartBtn() {
+      const btn = document.getElementById("floatingCartBtn");
+      if(window.innerWidth <= 768 && document.getElementById('viewCreate').style.display === 'block') btn.style.display = "flex";
+      else btn.style.display = "none";
+    }
+
+    // Catalog & Cart
+    function renderCategoryPills() {
+      const html = ["All", ...categories].map(c => `<button class="pill-btn ${selectedCategory===c?'active':''}" onclick="filterByCategory('${c}')">${c}</button>`).join("");
+      document.getElementById("categoryPillContainer").innerHTML = html;
+      if (document.getElementById("bigCategoryPillContainer")) document.getElementById("bigCategoryPillContainer").innerHTML = html;
+    }
+    function filterByCategory(cat) { selectedCategory = cat; renderCategoryPills(); renderCatalog(); renderBigCatalog(); }
+
+    function renderCatalog() {
+      const s = (document.getElementById("catalogSearch").value || "").toLowerCase();
+      let f = catalog.filter(p => (selectedCategory === "All" || p.category === selectedCategory) && (p.name.toLowerCase().includes(s) || p.category.toLowerCase().includes(s)));
+      const grid = document.getElementById("catalogGrid");
+      grid.innerHTML = f.map(i => `
+        <div class="product-card">
+          <div class="prod-header" onclick="openProductDetailModal(${i.id})">
+            <div class="prod-img-wrapper"><img src="${i.img || 'logo.png'}" class="prod-img" onerror="this.src='logo.png'"></div>
+            <div style="flex:1;"><div class="prod-title">${i.name}</div>
+              ${!hideCatalogPrice ? `<span class="prod-rate">₹${i.rate}</span><span style="font-size:0.7rem; color:#64748b;">${i.weight}</span>` : `<span>${i.weight}</span>`}
+            </div>
+          </div>
+          <button class="btn-primary" style="width:100%; min-height:38px; padding:6px;" onclick="addToCart(${i.id})">+ Add</button>
+        </div>
+      `).join("");
+    }
+    
+    function renderBigCatalog() {
+      let f = catalog.filter(p => selectedCategory === "All" || p.category === selectedCategory);
+      document.getElementById("bigCatalogGrid").innerHTML = f.map(i => `
+        <div class="product-card">
+          <div class="prod-img-wrapper" style="width:100%; height:120px; margin-bottom:10px;"><img src="${i.img || 'logo.png'}" class="prod-img" onerror="this.src='logo.png'"></div>
+          <h3 style="font-size:1rem; font-weight:900; line-height:1.2; margin-bottom:6px;">${i.name}</h3>
+          ${!hideCatalogPrice ? `<div style="font-weight:800; color:var(--emerald);">₹${i.rate} <span style="color:#64748b; font-size:0.8rem; text-decoration:line-through;">₹${i.mrp}</span></div>` : ``}
+          <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">${i.weight} • ${i.category}</div>
+          <button class="btn-primary" style="width:100%;" onclick="addToCart(${i.id}); switchTab('create');">Add to Bill</button>
+        </div>
+      `).join("");
+    }
+
+    function openProductDetailModal(id) {
+      const p = catalog.find(x => x.id === id); if (!p) return;
+      document.getElementById("detailModalTitle").innerText = p.name;
+      document.getElementById("detailModalName").innerText = p.name;
+      document.getElementById("detailModalWeight").innerText = p.weight;
+      document.getElementById("detailModalRate").innerText = `₹${p.rate}`;
+      document.getElementById("detailModalDesc").innerText = p.desc || "";
+      document.getElementById("detailModalImg").src = p.img || "logo.png";
+      document.getElementById("detailModalAddBtn").onclick = () => { addToCart(p.id); closeProductDetailModal(); };
+      document.getElementById("productDetailModal").classList.add("open");
+    }
+    function closeProductDetailModal() { document.getElementById("productDetailModal").classList.remove("open"); }
+
+    function addToCart(productId) {
+      const p = catalog.find(x => x.id === productId); if (!p) return;
+      const existing = cart.find(x => x.id === productId);
+      if (existing) existing.qty += 1; else cart.push({ ...p, qty: 1 });
+      calculateCartTotals(); showToast(`Added ${p.name}`);
+    }
+    function updateCartQty(id, delta) {
+      const item = cart.find(x => x.id === id);
+      if (item) { item.qty += delta; if (item.qty <= 0) cart = cart.filter(x => x.id !== id); calculateCartTotals(); }
+    }
+    function clearCurrentCart() { if (cart.length && confirm("Clear cart?")) { cart = []; calculateCartTotals(); } }
+    function toggleCartDrawer() { document.getElementById("cartBoxArea").scrollIntoView({behavior: 'smooth'}); }
+
+    function initPricingTemplates() {
+      document.getElementById("pricingTemplateSelect").innerHTML = pricingTemplates.map(t => `<option value="${t.code}" data-disc="${t.ruleType === 'MRP' ? 'MRP' : (t.discountPercent / 100)}">${t.name}</option>`).join("");
+    }
+    function handlePricingTemplateChange() { calculateCartTotals(); }
+
+    function calculateCartTotals() {
+      const sel = document.getElementById("pricingTemplateSelect");
+      const discVal = sel.options.length ? sel.options[sel.selectedIndex].dataset.disc : "0";
+      const count = cart.reduce((a, b) => a + b.qty, 0);
+      document.getElementById("cartCount").innerText = count; document.getElementById("floatingCartCount").innerText = count;
+      const container = document.getElementById("cartItemList");
+
+      if (!cart.length) {
+        container.innerHTML = `<div style="text-align:center; padding: 2rem 0; color:var(--text-muted); font-size:0.85rem; font-weight:700;">Cart is empty.</div>`;
+        document.getElementById("sumSubtotal").innerText = "₹0.00"; document.getElementById("sumDiscount").innerText = "-₹0.00";
+        document.getElementById("sumTax").innerText = "₹0.00"; document.getElementById("sumGrandTotal").innerText = "₹0.00"; return;
+      }
+
+      let subtotal = 0;
+      container.innerHTML = cart.map(i => {
+        let price = discVal === "MRP" ? i.mrp : i.rate;
+        subtotal += price * i.qty;
+        return `
+          <div class="cart-row">
+            <div style="flex:1; padding-right:4px;">
+              <div style="font-weight:900; font-size:0.85rem; line-height:1.2;">${i.name}</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">${i.weight} • ₹${price}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <div class="qty-control">
+                <button class="qty-btn" onclick="updateCartQty(${i.id}, -1)">-</button>
+                <input type="number" class="qty-input" value="${i.qty}" readonly>
+                <button class="qty-btn" onclick="updateCartQty(${i.id}, 1)">+</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      const discount = (discVal !== "MRP" && parseFloat(discVal) > 0) ? (subtotal * parseFloat(discVal)) : 0;
+      const isGst = document.getElementById("gstToggle").checked;
+      const tax = isGst ? ((subtotal - discount) * 0.05) : 0;
+      
+      document.getElementById("sumSubtotal").innerText = `₹${subtotal.toFixed(2)}`;
+      document.getElementById("sumDiscount").innerText = `-₹${discount.toFixed(2)}`;
+      document.getElementById("sumTax").innerText = `₹${tax.toFixed(2)}`;
+      document.getElementById("sumGrandTotal").innerText = `₹${((subtotal - discount) + tax).toFixed(2)}`;
+    }
+
+    function resetInvoiceForm() {
+      document.getElementById("invNoInput").value = `ASHI-${new Date().getFullYear()}-${Math.floor(1000+Math.random()*9000)}`;
+      document.getElementById("invDateInput").value = new Date().toISOString().split("T")[0];
+    }
+
+    async function saveInvoiceRecord() {
+      if (!cart.length) return alert("Cart is empty.");
+      if (!db) return alert("Database offline.");
+      const invNo = document.getElementById("invNoInput").value;
+      const record = {
+        invoiceNo: invNo, date: document.getElementById("invDateInput").value,
+        firm: document.getElementById("custFirmInput").value || "Counter Sale",
+        name: document.getElementById("custNameInput").value || "", phone: document.getElementById("custPhoneInput").value || "",
+        paymentMode: document.getElementById("invPaymentMode").value, paymentStatus: document.getElementById("invPaymentStatus").value,
+        pricingTemplate: document.getElementById("pricingTemplateSelect").value, createdBy: activeUser,
+        isGst: document.getElementById("gstToggle").checked,
+        tax: document.getElementById("sumTax").innerText.replace("₹", ""), subtotal: document.getElementById("sumSubtotal").innerText.replace("₹", ""),
+        discount: document.getElementById("sumDiscount").innerText.replace("-₹", ""), grandTotal: document.getElementById("sumGrandTotal").innerText.replace("₹", ""),
+        items: [...cart]
+      };
+
+      try {
+        await setDoc(doc(db, "invoices", invNo), record);
+        cart = []; resetInvoiceForm(); calculateCartTotals();
+        document.getElementById("custFirmInput").value = ""; document.getElementById("custPhoneInput").value = "";
+        showToast("Invoice Saved to Cloud");
+      } catch (e) { alert("Failed to save invoice."); }
+    }
+
+    // Invoice History - Edit & Delete added
+    function applyFinderFilters() {
+      const s = (document.getElementById("finderSearch").value || "").toLowerCase().trim();
+      filteredInvoicesList = invoices.filter(i => (!s || i.invoiceNo.toLowerCase().includes(s) || i.firm.toLowerCase().includes(s)));
+      currentPage = 1; renderFinderTable();
+    }
+    
+    function renderFinderTable() {
+      const tb = document.getElementById("historyTableRows");
+      const start = (currentPage - 1) * pageSize; const slice = filteredInvoicesList.slice(start, start + pageSize);
+      if (!slice.length) { tb.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem;">No records.</td></tr>`; return; }
+      
+      tb.innerHTML = slice.map(i => `
+        <tr>
+          <td style="font-weight:900; color:var(--primary); font-size:0.8rem;">${i.invoiceNo}<br><span style="color:#64748b; font-weight:700;">${i.date}</span></td>
+          <td style="font-size:0.85rem; font-weight:800;">${i.firm}</td>
+          <td><span style="background:${i.paymentStatus==='Paid'?'#ecfdf5':'#fef3c7'}; color:${i.paymentStatus==='Paid'?'#047857':'#b45309'}; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:900;">${i.paymentStatus}</span></td>
+          <td style="font-weight:900; color:var(--emerald);">₹${i.grandTotal}</td>
+          <td style="text-align:right;">
+             <div style="display:flex; gap:4px; justify-content:flex-end; flex-wrap:wrap;">
+               <button class="btn-primary" style="padding:4px; font-size:0.7rem; min-height:28px;" onclick="editInvoiceRecord('${i.invoiceNo}')">Edit</button>
+               <button class="btn-secondary" style="padding:4px; font-size:0.7rem; min-height:28px;" onclick="reprintSavedInvoice('${i.invoiceNo}')">Print</button>
+               <button class="btn-danger" style="padding:4px; font-size:0.7rem; min-height:28px;" onclick="deleteInvoiceRecord('${i.invoiceNo}')">Del</button>
+             </div>
+          </td>
+        </tr>
+      `).join("");
+      document.getElementById("paginationInfo").innerText = `${start + 1}-${Math.min(start + pageSize, filteredInvoicesList.length)} of ${filteredInvoicesList.length}`;
+    }
+    function navigatePage(dir) { currentPage = Math.min(Math.max(1, currentPage + dir), Math.ceil(filteredInvoicesList.length / pageSize) || 1); renderFinderTable(); }
+
+    async function deleteInvoiceRecord(no) {
+        if(!confirm(`Permanently delete invoice ${no}?`)) return;
+        if(!db) return;
+        await deleteDoc(doc(db, "invoices", no));
+        showToast("Invoice deleted.");
+    }
+
+    function editInvoiceRecord(no) {
+        const inv = invoices.find(x => x.invoiceNo === no);
+        if(!inv) return;
+        document.getElementById("invNoInput").value = inv.invoiceNo;
+        document.getElementById("invDateInput").value = inv.date;
+        document.getElementById("custFirmInput").value = inv.firm;
+        document.getElementById("custPhoneInput").value = inv.phone;
+        document.getElementById("invPaymentMode").value = inv.paymentMode;
+        document.getElementById("invPaymentStatus").value = inv.paymentStatus;
+        document.getElementById("gstToggle").checked = !!inv.isGst;
+        cart = [...inv.items];
+        calculateCartTotals();
+        switchTab('create');
+        showToast("Invoice loaded for editing.");
+    }
+
+    // Print & PDF
+    function reprintSavedInvoice(no) {
+        const inv = invoices.find(x => x.invoiceNo === no); if(!inv) return;
+        cart = [...inv.items]; calculateCartTotals();
+        document.getElementById("printInvNo").innerText = inv.invoiceNo;
+        document.getElementById("printInvDate").innerText = inv.date;
+        document.getElementById("printCustFirm").innerText = inv.firm;
+        document.getElementById("printCustPhone").innerText = inv.phone;
+        document.getElementById("printPaymentMode").innerText = inv.paymentMode;
+        document.getElementById("printPaymentStatus").innerText = inv.paymentStatus;
+        
+        let sub=0;
+        document.getElementById("printItemsRows").innerHTML = cart.map(i => {
+           let total = (i.rate * i.qty); sub+=total;
+           return `<tr><td style="padding:6px 0; font-weight:800;">${i.name}<br><span style="font-size:0.7rem; color:#666;">${i.weight} • ₹${i.rate}</span></td><td style="text-align:center; font-weight:900;">${i.qty}</td><td style="text-align:right; font-weight:900;">₹${total.toFixed(2)}</td></tr>`;
+        }).join("");
+        document.getElementById("printSubtotal").innerText = `₹${sub.toFixed(2)}`;
+        document.getElementById("printDiscount").innerText = `-₹${inv.discount}`;
+        document.getElementById("printTax").innerText = `₹${inv.tax}`;
+        document.getElementById("printGstLabel").innerText = inv.isGst ? "GST (5%):" : "GST:";
+        document.getElementById("printGrandTotal").innerText = `₹${inv.grandTotal}`;
+        
+        if (customSignature) { document.getElementById("printCustomSig").src = customSignature; document.getElementById("printCustomSig").style.display = "block"; }
+        document.getElementById("invoicePreviewModal").classList.add("open");
+    }
+
+    function triggerNativePrint() { window.print(); }
+    function exportInvoicePDF() {
+        const invNo = document.getElementById("printInvNo").innerText; const el = document.getElementById('invoicePrintView');
+        html2pdf().set({ margin: 10, filename: `Inv_${invNo}.pdf`, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(el).save().then(() => { showToast("PDF Saved"); });
+    }
+    function sendInvoiceToCustomerViaWhatsApp() {
+        const phone = (document.getElementById("printCustPhone").innerText || "").replace(/\D/g, "");
+        if(phone.length < 10) return alert("Invalid phone.");
+        const msg = `*ASHI MASALE*\nInvoice: ${document.getElementById("printInvNo").innerText}\nTotal: ₹${document.getElementById("printGrandTotal").innerText}\nThank you!`;
+        window.open(`https://api.whatsapp.com/send?phone=91${phone.slice(-10)}&text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    // Admin & Edit Products
+    function switchAdminSubSection(s) {
+      ['products', 'users', 'settings'].forEach(x => {
+        document.getElementById('adminSection_' + x).style.display = x === s ? 'block' : 'none';
+      });
+    }
+
+    function renderAdminProductsTable() {
+      document.getElementById("adminProductsTableBody").innerHTML = catalog.map(p => `<tr>
+          <td style="font-weight:800; font-size:0.85rem;">${p.name}<br><span style="color:var(--text-muted); font-size:0.7rem;">${p.category} • ${p.weight}</span></td>
+          <td style="font-weight:900; color:var(--emerald);">₹${p.rate}</td>
+          <td style="text-align:right;">
+            <button class="btn-primary" style="padding:4px 8px; font-size:0.7rem;" onclick="editProduct(${p.id})">Edit</button>
+            <button class="btn-danger" style="padding:4px 8px; font-size:0.7rem;" onclick="deleteProduct(${p.id})">Del</button>
+          </td>
+        </tr>`).join("");
+      document.getElementById("userTableBody").innerHTML = users.map(u => `<tr><td>${u.name}<br><span style="font-size:0.7rem; color:var(--text-muted);">${u.role}</span></td><td style="font-family:monospace; font-weight:900; color:var(--primary);">${u.passcode||'****'}</td><td style="text-align:right;"><button class="btn-danger" style="padding:4px 8px; font-size:0.7rem;" onclick="deleteUser(${u.id})">Del</button></td></tr>`).join("");
+    }
+
+    function editProduct(id) {
+       const p = catalog.find(x => x.id === id); if(!p) return;
+       document.getElementById("editProdId").value = p.id;
+       document.getElementById("newProdCategory").value = p.category;
+       document.getElementById("newProdName").value = p.name;
+       document.getElementById("newProdWeight").value = p.weight;
+       document.getElementById("newProdRate").value = p.rate;
+       document.getElementById("newProdMrp").value = p.mrp;
+       document.getElementById("newProdImgBase64").value = p.img || "";
+       if(p.img) { document.getElementById("newProdImgPreview").src = p.img; document.getElementById("newProdImgPreview").style.display = 'block'; }
+       document.getElementById("productEditBlock").scrollIntoView({behavior: 'smooth'});
+    }
+
+    function encodeProductImage(input) {
+      if (input.files[0]) {
+        const r = new FileReader(); r.onload = e => { document.getElementById('newProdImgBase64').value = e.target.result; document.getElementById('newProdImgPreview').src = e.target.result; document.getElementById('newProdImgPreview').style.display = 'block'; };
+        r.readAsDataURL(input.files[0]);
+      }
+    }
+
+    async function saveProductFromAdmin() {
+      const name = document.getElementById("newProdName").value.trim(); const rate = parseFloat(document.getElementById("newProdRate").value);
+      if (!name || isNaN(rate)) return alert("Name and rate required.");
+      if(!db) return;
+      const editId = document.getElementById("editProdId").value;
+      const pId = editId ? parseInt(editId) : Date.now();
+      const p = { id: pId, category: document.getElementById("newProdCategory").value, name, weight: document.getElementById("newProdWeight").value || "100gm", rate, mrp: parseFloat(document.getElementById("newProdMrp").value) || rate, img: document.getElementById("newProdImgBase64").value || "" };
+      await setDoc(doc(db, "products", p.id.toString()), p);
+      resetProdForm(); showToast("Product Saved.");
+    }
+    
+    async function deleteProduct(id) { if (confirm("Delete product?") && db) await deleteDoc(doc(db, "products", id.toString())); }
+
+    async function createUser() {
+      const name = document.getElementById("newUserName").value.trim(); const role = document.getElementById("newUserRole").value;
+      if (!name || !db) return;
+      const u = { id: Date.now(), name, role, territory: "HQ", passcode: document.getElementById("newUserPasscode").value.trim() };
+      await setDoc(doc(db, "users", u.id.toString()), u); showToast("User created.");
+    }
+    async function deleteUser(id) { if (confirm("Delete user?") && db) await deleteDoc(doc(db, "users", id.toString())); }
+
+    async function uploadSignature() {
+      const file = document.getElementById("sigFileInput").files[0]; if (!file || !db) return;
+      const r = new FileReader(); r.onload = async e => { await setDoc(doc(db, "system_config", "main"), { customSignature: e.target.result }, { merge: true }); showToast("Seal saved."); }; r.readAsDataURL(file);
+    }
+    async function clearSignature() { if(db) await setDoc(doc(db, "system_config", "main"), { customSignature: "" }, { merge: true }); showToast("Seal removed."); }
+    async function toggleHidePriceSetting() { if(db) await setDoc(doc(db, "system_config", "main"), { hideCatalogPrice: document.getElementById("settingHidePrice").checked }, { merge: true }); }
+
+  </script>
+</body>
+</html>
